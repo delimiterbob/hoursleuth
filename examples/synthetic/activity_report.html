@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hoursleuth Activity Report</title>
+<style>
+:root {
+  --bg: #f7f7f5; --card: #ffffff; --ink: #1d1d1b; --muted: #6b6b66; --line: #e4e3de; --grid: #eeede9;
+  --c-billable: #2f6fde; --c-admin: #d98a1c; --c-personal: #9b59b6; --c-unclear: #a3a39d;
+  --s1: #2f6fde; --s2: #18a37a; --s3: #d98a1c; --s4: #e0b341; --s5: #9b59b6; --s6: #d1495b; --s7: #6b8794;
+  --heat0: #eef2fb; --heat1: #c7d6f5; --heat2: #8eaeea; --heat3: #4f80de; --heat4: #1f4fb0;
+  --tip-bg: #1d1d1b; --tip-ink: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141413; --card: #1f1f1d; --ink: #ececea; --muted: #a2a29c; --line: #34342f; --grid: #2a2a27;
+    --c-billable: #6b9bf0; --c-admin: #e9a443; --c-personal: #b98ad0; --c-unclear: #77776f;
+    --s1: #6b9bf0; --s2: #3cc497; --s3: #e9a443; --s4: #ecc75f; --s5: #b98ad0; --s6: #e5707f; --s7: #8fa9b5;
+    --heat0: #23262d; --heat1: #263b63; --heat2: #2f5296; --heat3: #4a78cf; --heat4: #8db0f2;
+    --tip-bg: #ececea; --tip-ink: #141413;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141413; --card: #1f1f1d; --ink: #ececea; --muted: #a2a29c; --line: #34342f; --grid: #2a2a27;
+  --c-billable: #6b9bf0; --c-admin: #e9a443; --c-personal: #b98ad0; --c-unclear: #77776f;
+  --s1: #6b9bf0; --s2: #3cc497; --s3: #e9a443; --s4: #ecc75f; --s5: #b98ad0; --s6: #e5707f; --s7: #8fa9b5;
+  --heat0: #23262d; --heat1: #263b63; --heat2: #2f5296; --heat3: #4a78cf; --heat4: #8db0f2;
+  --tip-bg: #ececea; --tip-ink: #141413;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 1120px; margin: 0 auto; padding: 24px 16px 64px; }
+header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+h1 { font-size: 26px; margin: 0 0 4px; letter-spacing: -0.01em; }
+h2 { font-size: 16px; margin: 0 0 2px; }
+.sub { color: var(--muted); margin: 0; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 18px 18px 14px; margin-bottom: 16px; break-inside: avoid; }
+.card > .sub { margin-bottom: 12px; font-size: 13px; }
+button { font: inherit; color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+button:hover { border-color: var(--muted); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.tile { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.tile .v { font-size: 26px; font-weight: 650; letter-spacing: -0.02em; }
+.tile .l { color: var(--muted); font-size: 12px; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--muted); margin: 4px 0 8px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+svg { display: block; width: 100%; overflow: visible; }
+svg text { fill: var(--muted); font-size: 11px; }
+svg .val { fill: var(--ink); font-size: 11px; font-weight: 600; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--card); border-color: var(--ink); }
+.tablewrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--muted); font-weight: 600; font-size: 12px; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr.blk { cursor: pointer; }
+tr.blk:hover td { background: var(--grid); }
+tr.detail td { background: var(--bg); font-size: 12px; color: var(--muted); }
+tr.detail ul { margin: 0; padding-left: 18px; }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+.flag { font-size: 11px; color: var(--c-admin); border: 1px solid var(--c-admin); border-radius: 4px; padding: 0 4px; margin-left: 6px; white-space: nowrap; }
+#tip { position: fixed; pointer-events: none; background: var(--tip-bg); color: var(--tip-ink); font-size: 12px; padding: 7px 9px; border-radius: 6px; max-width: 320px; z-index: 10; display: none; white-space: pre-line; }
+.note { font-size: 13px; color: var(--muted); }
+.note li { margin-bottom: 4px; }
+@media print {
+  body { background: #fff; }
+  button, .chips, #tip { display: none !important; }
+  .card, .tile { border-color: #ccc; }
+  tr.detail { display: none; }
+}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>Activity report</h1>
+      <p class="sub" id="range"></p>
+    </div>
+    <button id="theme" type="button" aria-label="Toggle light or dark theme">Theme</button>
+  </header>
+
+  <div class="tiles" id="tiles"></div>
+
+  <section class="card"><h2>Weekly hours vs. allocation</h2><p class="sub" id="weeklySub"></p><div class="legend" data-legend="cats"></div><div id="weekly"></div></section>
+  <section class="card"><h2>Hours per day</h2><p class="sub">Each block's minutes are split across categories in proportion to its signals.</p><div class="legend" data-legend="cats"></div><div id="daily"></div></section>
+  <section class="card"><h2>Daily timeline</h2><p class="sub">Each bar is one block of continuous activity, colored by its majority category. Hover for detail.</p><div class="legend" data-legend="cats"></div><div id="gantt"></div></section>
+  <section class="card"><h2>When you work</h2><p class="sub">Signals per hour of the day. Darker means more activity.</p><div id="heat"></div></section>
+  <section class="card"><h2>Who you worked with</h2><p class="sub">Chat counterparts and email recipients. Client contacts are labeled.</p><div class="legend" id="peopleLegend"></div><div id="people"></div></section>
+  <section class="card"><h2>Where the signals came from</h2><p class="sub">Signals per day by source.</p><div class="legend" id="srcLegend"></div><div id="sources"></div></section>
+
+  <section class="card">
+    <h2>Draft timesheet</h2>
+    <p class="sub">Billable hours per day, rounded up to the quarter hour, with a description drafted from that day's billable meetings and themes. Review before entering.</p>
+    <div class="tablewrap"><table id="timesheet"></table></div>
+  </section>
+
+  <section class="card">
+    <h2>All activity blocks</h2>
+    <p class="sub">Click a row to see every signal behind it.</p>
+    <div class="chips" id="chips"></div>
+    <div class="tablewrap"><table id="blocks"></table></div>
+  </section>
+
+  <section class="card note">
+    <h2 style="color:var(--ink)">How this was built</h2>
+    <ul id="method"></ul>
+  </section>
+</main>
+<div id="tip" role="tooltip"></div>
+
+<script>
+const DATA = {"blocks":[{"Date":"2026-03-02","Day":"Mon","Category":"Billable","BillableMin":126,"AdminMin":0,"PersonalMin":0,"UnclearMin":0,"Start":"08:54","End":"11:00","Minutes":126,"Signals":14,"Sources":"Browser x8; Slack x3; Meeting x2; Email x1","Meetings":"Client A daily stand-up | Client A kickoff","Activity":"#client-a-team | DM Person 2 | Sent: Discovery questionnaire draft"},{"Date":"2026-03-02","Day":"Mon","Category":"Billable (some Admin)","BillableMin":80,"AdminMin":75,"PersonalMin":0,"UnclearMin":0,"Start":"12:51","End":"15:26","Minutes":155,"Signals":29,"Sources":"Browser x18; Drive x4; Slack x4; Email x2; Meeting x1","Meetings":"Laptop setup with IT (Person 6)","Activity":"DM Person 2 | RACI draft saved | Steering deck v2 saved | Group DM"},{"Date":"2026-03-03","Day":"Tue","Category":"Billable","BillableMin":40,"AdminMin":0,"PersonalMin":0,"UnclearMin":0,"Start":"09:05","End":"09:45","Minutes":40,"Signals":15,"Sources":"Browser x10; Drive x2; Email x2; Meeting x1","Meetings":"Client A daily stand-up","Activity":"Discovery questionnaire saved | Sent: Interview schedule for next week | Sent: Re: SOW comments"},{"Date":"2026-03-03","Day":"Tue","Category":"Billable","BillableMin":60,"AdminMin":0,"PersonalMin":0,"UnclearMin":0,"Start":"11:00","End":"12:00","Minutes":60,"Signals":1,"Sources":"Meeting x1","Meetings":"Client A stakeholder interviews","Activity":""},{"Date":"2026-03-03","Day":"Tue","Category":"Billable","BillableMin":120,"AdminMin":0,"PersonalMin":0,"UnclearMin":0,"Start":"13:56","End":"15:56","Minutes":120,"Signals":30,"Sources":"Browser x21; Slack x4; Drive x3; Email x2","Meetings":"","Activity":"SOW redline saved | #client-a-team | Sent: Discovery questionnaire draft | DM Person 2"},{"Date":"2026-03-04","Day":"Wed","Category":"Billable","BillableMin":106,"AdminMin":0,"PersonalMin":0,"UnclearMin":0,"Start":"08:47","End":"10:33","Minutes":106,"Signals":20,"Sources":"Browser x13; Slack x4; Drive x2; Meeting x1","Meetings":"Client A daily stand-up","Activity":"#client-a-team | Stakeholder map saved | DM Person 2 | Interview notes saved"},{"Date":"2026-03-04","Day":"Wed","Category":"Billable","BillableMin":145,"AdminMin":0,"PersonalMin":0,"UnclearMin":0,"Start":"13:35","End":"16:00","Minutes":145,"Signals":21,"Sources":"Browser x11; Drive x3; Email x3; Slack x3; Meeting x1","Meetings":"Client A steering deck review","Activity":"#client-a-team | DM Person 1 | Sent: Steering deck outline | RACI draft saved"},{"Date":"2026-03-05","Day":"Thu","Category":"Billable","BillableMin":56,"AdminMin":0,"PersonalMin":0,"UnclearMin":0,"Start":"08:49","End":"09:45","Minutes":56,"Signals":13,"Sources":"Browser x6; Slack x4; Meeting x1; Drive x1; Email x1","Meetings":"Client A daily stand-up","Activity":"#client-a-team | DM Person 1 | RACI draft saved | Sent: Re: Stakeholder map"},{"Date":"2026-03-05","Day":"Thu","Category":"Billable","BillableMin":61,"AdminMin":0,"PersonalMin":0,"UnclearMin":0,"Start":"10:59","End":"12:00","Minutes":61,"Signals":3,"Sources":"Browser x2; Meeting x1","Meetings":"Client A stakeholder interviews","Activity":"Browser: portal.client-a.example.com | Browser: client-a.example.com"},{"Date":"2026-03-05","Day":"Thu","Category":"Billable","BillableMin":87,"AdminMin":0,"PersonalMin":0,"UnclearMin":0,"Start":"13:20","End":"14:47","Minutes":87,"Signals":17,"Sources":"Browser x12; Drive x3; Email x1; Meeting (inferred) x1","Meetings":"Chat call with Person 2","Activity":"SOW redline saved | Stakeholder map saved | RAID log updated | Sent: Interview schedule for next week"},{"Date":"2026-03-06","Day":"Fri","Category":"Billable","BillableMin":45,"AdminMin":0,"PersonalMin":0,"UnclearMin":0,"Start":"09:02","End":"09:47","Minutes":45,"Signals":16,"Sources":"Browser x10; Drive x2; Slack x2; Meeting x1; Email x1","Meetings":"Client A daily stand-up","Activity":"Discovery questionnaire saved | #client-a-team | Sent: Re: Kickoff agenda"},{"Date":"2026-03-06","Day":"Fri","Category":"Admin (some Billable)","BillableMin":75,"AdminMin":119,"PersonalMin":0,"UnclearMin":0,"Start":"14:17","End":"17:31","Minutes":194,"Signals":16,"Sources":"Browser x10; Slack x2; Drive x2; Meeting x1; Email x1","Meetings":"Firm onboarding: training session","Activity":"DM Person 2 | Weekly timesheet notes saved [Admin] | Sent: Re: Stakeholder map | RAID log updated"},{"Date":"2026-03-09","Day":"Mon","Category":"Billable","BillableMin":53,"AdminMin":0,"PersonalMin":0,"UnclearMin":0,"Start":"09:09","End":"10:02","Minutes":53,"Signals":11,"Sources":"Browser x5; Slack x5; Meeting x1","Meetings":"Client A daily stand-up","Activity":"Group DM | DM Person 2 | #client-a-team"},{"Date":"2026-03-09","Day":"Mon","Category":"Billable","BillableMin":88,"AdminMin":0,"PersonalMin":0,"UnclearMin":0,"Start":"14:19","End":"15:47","Minutes":88,"Signals":20,"Sources":"Browser x11; Slack x6; Email x2; Drive x1","Meetings":"","Activity":"DM Person 1 | #client-a-team | Sent: Re: Stakeholder map | Sent: Re: Kickoff agenda"},{"Date":"2026-03-10","Day":"Tue","Category":"Billable","BillableMin":5,"AdminMin":0,"PersonalMin":0,"UnclearMin":0,"Start":"04:02","End":"04:07","Minutes":5,"Signals":5,"Sources":"Browser x5","Meetings":"","Activity":"Browser: app.slack.com | Browser: mail.google.com | Browser: client-a.example.com | Browser: docs.google.com"},{"Date":"2026-03-10","Day":"Tue","Category":"Billable","BillableMin":51,"AdminMin":0,"PersonalMin":0,"UnclearMin":0,"Start":"08:54","End":"09:45","Minutes":51,"Signals":8,"Sources":"Browser x3; Slack x2; Meeting x1; Drive x1; Email x1","Meetings":"Client A daily stand-up","Activity":"DM Person 2 | #client-a-team | Sent: VPN access request | Discovery questionnaire saved"},{"Date":"2026-03-10","Day":"Tue","Category":"Billable (some Personal)","BillableMin":90,"AdminMin":0,"PersonalMin":24,"UnclearMin":0,"Start":"10:57","End":"12:51","Minutes":114,"Signals":9,"Sources":"Browser x5; Slack x2; Email x1; Meeting x1","Meetings":"Client A stakeholder interviews","Activity":"DM Person 4 [Personal] | Sent: [Personal] Re: Weekend plans"},{"Date":"2026-03-10","Day":"Tue","Category":"Billable","BillableMin":71,"AdminMin":0,"PersonalMin":0,"UnclearMin":0,"Start":"14:02","End":"15:13","Minutes":71,"Signals":19,"Sources":"Browser x12; Email x5; Slack x2","Meetings":"","Activity":"Sent: Discovery questionnaire draft | #client-a-team | Sent: Steering deck outline | Sent: Interview schedule for next week"},{"Date":"2026-03-11","Day":"Wed","Category":"Billable","BillableMin":56,"AdminMin":0,"PersonalMin":0,"UnclearMin":0,"Start":"08:49","End":"09:45","Minutes":56,"Signals":16,"Sources":"Browser x11; Drive x2; Meeting x1; Email x1; Slack x1","Meetings":"Client A daily stand-up","Activity":"Sent: Re: Kickoff agenda | Discovery questionnaire saved | Steering deck v2 saved | #client-a-team"},{"Date":"2026-03-11","Day":"Wed","Category":"Billable","BillableMin":40,"AdminMin":0,"PersonalMin":0,"UnclearMin":0,"Start":"13:35","End":"14:15","Minutes":40,"Signals":8,"Sources":"Browser x5; Slack x2; Drive x1","Meetings":"","Activity":"Group DM | #client-a-team | RAID log updated"},{"Date":"2026-03-11","Day":"Wed","Category":"Billable","BillableMin":64,"AdminMin":0,"PersonalMin":0,"UnclearMin":0,"Start":"14:56","End":"16:00","Minutes":64,"Signals":4,"Sources":"Browser x3; Meeting x1","Meetings":"Client A steering deck review","Activity":"Browser: mail.google.com | Browser: portal.client-a.example.com"},{"Date":"2026-03-12","Day":"Thu","Category":"Billable","BillableMin":55,"AdminMin":0,"PersonalMin":0,"UnclearMin":0,"Start":"08:50","End":"09:45","Minutes":55,"Signals":16,"Sources":"Browser x11; Slack x2; Meeting x1; Drive x1; Email x1","Meetings":"Client A daily stand-up","Activity":"Sent: Steering deck outline | RACI draft saved | DM Person 1 | Group DM"},{"Date":"2026-03-12","Day":"Thu","Category":"Billable","BillableMin":60,"AdminMin":0,"PersonalMin":0,"UnclearMin":0,"Start":"11:00","End":"12:00","Minutes":60,"Signals":1,"Sources":"Meeting x1","Meetings":"Client A stakeholder interviews","Activity":""},{"Date":"2026-03-12","Day":"Thu","Category":"Billable","BillableMin":35,"AdminMin":0,"PersonalMin":0,"UnclearMin":0,"Start":"14:01","End":"14:36","Minutes":35,"Signals":10,"Sources":"Browser x7; Email x2; Slack x1","Meetings":"","Activity":"Group DM | Sent: Interview schedule for next week | Sent: Re: SOW comments"},{"Date":"2026-03-13","Day":"Fri","Category":"Billable","BillableMin":61,"AdminMin":0,"PersonalMin":0,"UnclearMin":0,"Start":"08:44","End":"09:45","Minutes":61,"Signals":17,"Sources":"Browser x12; Drive x3; Meeting x1; Email x1","Meetings":"Client A daily stand-up","Activity":"Interview notes saved | RAID log updated | Sent: Discovery questionnaire draft | SOW redline saved"},{"Date":"2026-03-13","Day":"Fri","Category":"Billable","BillableMin":39,"AdminMin":0,"PersonalMin":0,"UnclearMin":0,"Start":"14:10","End":"14:49","Minutes":39,"Signals":10,"Sources":"Browser x7; Drive x2; Slack x1","Meetings":"","Activity":"DM Person 2 | SOW redline saved | Steering deck v2 saved"},{"Date":"2026-03-13","Day":"Fri","Category":"Admin","BillableMin":0,"AdminMin":80,"PersonalMin":0,"UnclearMin":0,"Start":"16:00","End":"17:20","Minutes":80,"Signals":3,"Sources":"Drive x1; Browser x1; Meeting x1","Meetings":"Firm onboarding: training session","Activity":"Weekly timesheet notes saved [Admin]"},{"Date":"2026-03-16","Day":"Mon","Category":"Billable","BillableMin":35,"AdminMin":0,"PersonalMin":0,"UnclearMin":0,"Start":"09:10","End":"09:45","Minutes":35,"Signals":8,"Sources":"Browser x5; Slack x2; Meeting x1","Meetings":"Client A daily stand-up","Activity":"#client-a-team | DM Person 1"},{"Date":"2026-03-16","Day":"Mon","Category":"Billable","BillableMin":78,"AdminMin":0,"PersonalMin":0,"UnclearMin":0,"Start":"14:03","End":"15:21","Minutes":78,"Signals":21,"Sources":"Browser x15; Slack x3; Drive x2; Email x1","Meetings":"","Activity":"DM Person 2 | Steering deck v2 saved | Sent: Steering deck outline | #client-a-team"}],"events":[{"s":"2026-03-02T08:54","e":"2026-03-02T08:54","src":"Slack","d":"#client-a-team","b":0},{"s":"2026-03-02T09:00","e":"2026-03-02T09:00","src":"Email","d":"Sent: Discovery questionnaire draft (Client Contact 1)","b":0},{"s":"2026-03-02T09:14","e":"2026-03-02T09:14","src":"Browser","d":"Browser: client-a.example.com","b":0},{"s":"2026-03-02T09:15","e":"2026-03-02T09:15","src":"Browser","d":"Browser: claude.ai","b":0},{"s":"2026-03-02T09:16","e":"2026-03-02T09:16","src":"Slack","d":"DM Person 2","b":0},{"s":"2026-03-02T09:18","e":"2026-03-02T09:18","src":"Browser","d":"Browser: claude.ai","b":0},{"s":"2026-03-02T09:20","e":"2026-03-02T09:20","src":"Browser","d":"Browser: app.slack.com","b":0},{"s":"2026-03-02T09:21","e":"2026-03-02T09:21","src":"Browser","d":"Browser: portal.client-a.example.com","b":0},{"s":"2026-03-02T09:25","e":"2026-03-02T09:25","src":"Slack","d":"#client-a-team","b":0},{"s":"2026-03-02T09:30","e":"2026-03-02T09:45","src":"Meeting","d":"Client A daily stand-up","b":0},{"s":"2026-03-02T09:35","e":"2026-03-02T09:35","src":"Browser","d":"Browser: portal.client-a.example.com","b":0},{"s":"2026-03-02T09:41","e":"2026-03-02T09:41","src":"Browser","d":"Browser: portal.client-a.example.com","b":0},{"s":"2026-03-02T09:59","e":"2026-03-02T09:59","src":"Browser","d":"Browser: docs.google.com","b":0},{"s":"2026-03-02T10:00","e":"2026-03-02T11:00","src":"Meeting","d":"Client A kickoff","b":0},{"s":"2026-03-02T12:51","e":"2026-03-02T12:51","src":"Browser","d":"Browser: calendar.google.com","b":1},{"s":"2026-03-02T13:00","e":"2026-03-02T13:45","src":"Meeting","d":"Laptop setup with IT (Person 6)","b":1},{"s":"2026-03-02T13:07","e":"2026-03-02T13:07","src":"Browser","d":"Browser: portal.client-a.example.com","b":1},{"s":"2026-03-02T13:54","e":"2026-03-02T13:54","src":"Browser","d":"Browser: portal.client-a.example.com","b":1},{"s":"2026-03-02T14:00","e":"2026-03-02T14:00","src":"Slack","d":"DM Person 5 (onboarding paperwork)","b":1},{"s":"2026-03-02T14:00","e":"2026-03-02T14:00","src":"Drive","d":"Interview notes saved","b":1},{"s":"2026-03-02T14:00","e":"2026-03-02T14:00","src":"Browser","d":"Browser: calendar.google.com","b":1},{"s":"2026-03-02T14:09","e":"2026-03-02T14:09","src":"Browser","d":"Browser: calendar.google.com","b":1},{"s":"2026-03-02T14:10","e":"2026-03-02T14:10","src":"Browser","d":"Browser: claude.ai","b":1},{"s":"2026-03-02T14:10","e":"2026-03-02T14:10","src":"Email","d":"Sent: Re: Benefits enrollment (Person 5)","b":1},{"s":"2026-03-02T14:17","e":"2026-03-02T14:17","src":"Browser","d":"Browser: calendar.google.com","b":1},{"s":"2026-03-02T14:19","e":"2026-03-02T14:19","src":"Browser","d":"Browser: mail.google.com","b":1},{"s":"2026-03-02T14:21","e":"2026-03-02T14:21","src":"Email","d":"Sent: Re: Stakeholder map (Person 3)","b":1},{"s":"2026-03-02T14:22","e":"2026-03-02T14:22","src":"Browser","d":"Browser: app.slack.com","b":1},{"s":"2026-03-02T14:25","e":"2026-03-02T14:25","src":"Drive","d":"Tax form saved [Admin]","b":1},{"s":"2026-03-02T14:31","e":"2026-03-02T14:31","src":"Browser","d":"Browser: portal.client-a.example.com","b":1},{"s":"2026-03-02T14:42","e":"2026-03-02T14:42","src":"Browser","d":"Browser: client-a.example.com","b":1},{"s":"2026-03-02T14:43","e":"2026-03-02T14:43","src":"Slack","d":"DM Person 2","b":1},{"s":"2026-03-02T14:45","e":"2026-03-02T14:45","src":"Browser","d":"Browser: app.slack.com","b":1},{"s":"2026-03-02T14:52","e":"2026-03-02T14:52","src":"Browser","d":"Browser: client-a.example.com","b":1},{"s":"2026-03-02T14:52","e":"2026-03-02T14:52","src":"Drive","d":"Steering deck v2 saved","b":1},{"s":"2026-03-02T14:54","e":"2026-03-02T14:54","src":"Browser","d":"Browser: claude.ai","b":1},{"s":"2026-03-02T14:59","e":"2026-03-02T14:59","src":"Browser","d":"Browser: calendar.google.com","b":1},{"s":"2026-03-02T15:01","e":"2026-03-02T15:01","src":"Browser","d":"Browser: client-a.example.com","b":1},{"s":"2026-03-02T15:03","e":"2026-03-02T15:03","src":"Browser","d":"Browser: portal.client-a.example.com","b":1},{"s":"2026-03-02T15:04","e":"2026-03-02T15:04","src":"Slack","d":"Group DM (Person 1, Person 3)","b":1},{"s":"2026-03-02T15:05","e":"2026-03-02T15:05","src":"Browser","d":"Browser: docs.google.com","b":1},{"s":"2026-03-02T15:11","e":"2026-03-02T15:11","src":"Slack","d":"DM Person 2","b":1},{"s":"2026-03-02T15:26","e":"2026-03-02T15:26","src":"Drive","d":"RACI draft saved","b":1},{"s":"2026-03-03T09:05","e":"2026-03-03T09:05","src":"Email","d":"Sent: Interview schedule for next week (Client Contact 1)","b":2},{"s":"2026-03-03T09:08","e":"2026-03-03T09:08","src":"Browser","d":"Browser: claude.ai","b":2},{"s":"2026-03-03T09:10","e":"2026-03-03T09:10","src":"Email","d":"Sent: Re: SOW comments (Person 2)","b":2},{"s":"2026-03-03T09:19","e":"2026-03-03T09:19","src":"Drive","d":"Discovery questionnaire saved","b":2},{"s":"2026-03-03T09:19","e":"2026-03-03T09:19","src":"Browser","d":"Browser: mail.google.com","b":2},{"s":"2026-03-03T09:20","e":"2026-03-03T09:20","src":"Browser","d":"Browser: portal.client-a.example.com","b":2},{"s":"2026-03-03T09:24","e":"2026-03-03T09:24","src":"Browser","d":"Browser: portal.client-a.example.com","b":2},{"s":"2026-03-03T09:25","e":"2026-03-03T09:25","src":"Browser","d":"Browser: portal.client-a.example.com","b":2},{"s":"2026-03-03T09:25","e":"2026-03-03T09:25","src":"Browser","d":"Browser: claude.ai","b":2},{"s":"2026-03-03T09:29","e":"2026-03-03T09:29","src":"Drive","d":"Discovery questionnaire saved","b":2},{"s":"2026-03-03T09:29","e":"2026-03-03T09:29","src":"Browser","d":"Browser: app.slack.com","b":2},{"s":"2026-03-03T09:30","e":"2026-03-03T09:45","src":"Meeting","d":"Client A daily stand-up","b":2},{"s":"2026-03-03T09:39","e":"2026-03-03T09:39","src":"Browser","d":"Browser: claude.ai","b":2},{"s":"2026-03-03T09:40","e":"2026-03-03T09:40","src":"Browser","d":"Browser: app.slack.com","b":2},{"s":"2026-03-03T09:41","e":"2026-03-03T09:41","src":"Browser","d":"Browser: docs.google.com","b":2},{"s":"2026-03-03T11:00","e":"2026-03-03T12:00","src":"Meeting","d":"Client A stakeholder interviews","b":3},{"s":"2026-03-03T13:56","e":"2026-03-03T13:56","src":"Browser","d":"Browser: app.slack.com","b":4},{"s":"2026-03-03T14:04","e":"2026-03-03T14:04","src":"Slack","d":"DM Person 1","b":4},{"s":"2026-03-03T14:11","e":"2026-03-03T14:11","src":"Browser","d":"Browser: claude.ai","b":4},{"s":"2026-03-03T14:13","e":"2026-03-03T14:13","src":"Browser","d":"Browser: client-a.example.com","b":4},{"s":"2026-03-03T14:19","e":"2026-03-03T14:19","src":"Slack","d":"Group DM (Person 1, Person 3)","b":4},{"s":"2026-03-03T14:23","e":"2026-03-03T14:23","src":"Browser","d":"Browser: claude.ai","b":4},{"s":"2026-03-03T14:24","e":"2026-03-03T14:24","src":"Browser","d":"Browser: mail.google.com","b":4},{"s":"2026-03-03T14:24","e":"2026-03-03T14:24","src":"Browser","d":"Browser: portal.client-a.example.com","b":4},{"s":"2026-03-03T14:25","e":"2026-03-03T14:25","src":"Browser","d":"Browser: claude.ai","b":4},{"s":"2026-03-03T14:26","e":"2026-03-03T14:26","src":"Browser","d":"Browser: portal.client-a.example.com","b":4},{"s":"2026-03-03T14:29","e":"2026-03-03T14:29","src":"Drive","d":"Interview notes saved","b":4},{"s":"2026-03-03T14:31","e":"2026-03-03T14:31","src":"Browser","d":"Browser: claude.ai","b":4},{"s":"2026-03-03T14:32","e":"2026-03-03T14:32","src":"Browser","d":"Browser: calendar.google.com","b":4},{"s":"2026-03-03T14:35","e":"2026-03-03T14:35","src":"Email","d":"Sent: VPN access request (Client Contact 2)","b":4},{"s":"2026-03-03T14:37","e":"2026-03-03T14:37","src":"Browser","d":"Browser: portal.client-a.example.com","b":4},{"s":"2026-03-03T14:43","e":"2026-03-03T14:43","src":"Browser","d":"Browser: calendar.google.com","b":4},{"s":"2026-03-03T14:46","e":"2026-03-03T14:46","src":"Browser","d":"Browser: mail.google.com","b":4},{"s":"2026-03-03T14:54","e":"2026-03-03T14:54","src":"Browser","d":"Browser: client-a.example.com","b":4},{"s":"2026-03-03T14:56","e":"2026-03-03T14:56","src":"Drive","d":"RAID log updated","b":4},{"s":"2026-03-03T15:14","e":"2026-03-03T15:14","src":"Browser","d":"Browser: mail.google.com","b":4},{"s":"2026-03-03T15:14","e":"2026-03-03T15:14","src":"Slack","d":"#client-a-team","b":4},{"s":"2026-03-03T15:15","e":"2026-03-03T15:15","src":"Browser","d":"Browser: app.slack.com","b":4},{"s":"2026-03-03T15:19","e":"2026-03-03T15:19","src":"Browser","d":"Browser: claude.ai","b":4},{"s":"2026-03-03T15:25","e":"2026-03-03T15:25","src":"Drive","d":"SOW redline saved","b":4},{"s":"2026-03-03T15:30","e":"2026-03-03T15:30","src":"Slack","d":"DM Person 2","b":4},{"s":"2026-03-03T15:35","e":"2026-03-03T15:35","src":"Browser","d":"Browser: app.slack.com","b":4},{"s":"2026-03-03T15:44","e":"2026-03-03T15:44","src":"Email","d":"Sent: Discovery questionnaire draft (Client Contact 1)","b":4},{"s":"2026-03-03T15:44","e":"2026-03-03T15:44","src":"Browser","d":"Browser: claude.ai","b":4},{"s":"2026-03-03T15:50","e":"2026-03-03T15:50","src":"Browser","d":"Browser: docs.google.com","b":4},{"s":"2026-03-03T15:56","e":"2026-03-03T15:56","src":"Browser","d":"Browser: app.slack.com","b":4},{"s":"2026-03-04T08:47","e":"2026-03-04T08:47","src":"Browser","d":"Browser: calendar.google.com","b":5},{"s":"2026-03-04T08:59","e":"2026-03-04T08:59","src":"Slack","d":"DM Person 1","b":5},{"s":"2026-03-04T09:00","e":"2026-03-04T09:00","src":"Browser","d":"Browser: portal.client-a.example.com","b":5},{"s":"2026-03-04T09:11","e":"2026-03-04T09:11","src":"Browser","d":"Browser: claude.ai","b":5},{"s":"2026-03-04T09:14","e":"2026-03-04T09:14","src":"Drive","d":"Interview notes saved","b":5},{"s":"2026-03-04T09:17","e":"2026-03-04T09:17","src":"Browser","d":"Browser: calendar.google.com","b":5},{"s":"2026-03-04T09:28","e":"2026-03-04T09:28","src":"Browser","d":"Browser: portal.client-a.example.com","b":5},{"s":"2026-03-04T09:30","e":"2026-03-04T09:30","src":"Browser","d":"Browser: mail.google.com","b":5},{"s":"2026-03-04T09:30","e":"2026-03-04T09:45","src":"Meeting","d":"Client A daily stand-up","b":5},{"s":"2026-03-04T09:33","e":"2026-03-04T09:33","src":"Browser","d":"Browser: app.slack.com","b":5},{"s":"2026-03-04T09:37","e":"2026-03-04T09:37","src":"Browser","d":"Browser: app.slack.com","b":5},{"s":"2026-03-04T09:41","e":"2026-03-04T09:41","src":"Browser","d":"Browser: client-a.example.com","b":5},{"s":"2026-03-04T09:49","e":"2026-03-04T09:49","src":"Slack","d":"#client-a-team","b":5},{"s":"2026-03-04T09:55","e":"2026-03-04T09:55","src":"Browser","d":"Browser: portal.client-a.example.com","b":5},{"s":"2026-03-04T10:00","e":"2026-03-04T10:00","src":"Drive","d":"Stakeholder map saved","b":5},{"s":"2026-03-04T10:15","e":"2026-03-04T10:15","src":"Slack","d":"#client-a-team","b":5},{"s":"2026-03-04T10:25","e":"2026-03-04T10:25","src":"Browser","d":"Browser: app.slack.com","b":5},{"s":"2026-03-04T10:26","e":"2026-03-04T10:26","src":"Browser","d":"Browser: calendar.google.com","b":5},{"s":"2026-03-04T10:33","e":"2026-03-04T10:33","src":"Slack","d":"DM Person 2","b":5},{"s":"2026-03-04T10:33","e":"2026-03-04T10:33","src":"Browser","d":"Browser: mail.google.com","b":5},{"s":"2026-03-04T13:35","e":"2026-03-04T13:35","src":"Browser","d":"Browser: claude.ai","b":6},{"s":"2026-03-04T13:37","e":"2026-03-04T13:37","src":"Slack","d":"#client-a-team","b":6},{"s":"2026-03-04T13:37","e":"2026-03-04T13:37","src":"Browser","d":"Browser: claude.ai","b":6},{"s":"2026-03-04T13:38","e":"2026-03-04T13:38","src":"Browser","d":"Browser: claude.ai","b":6},{"s":"2026-03-04T13:54","e":"2026-03-04T13:54","src":"Email","d":"Sent: Interview schedule for next week (Client Contact 1)","b":6},{"s":"2026-03-04T13:58","e":"2026-03-04T13:58","src":"Browser","d":"Browser: client-a.example.com","b":6},{"s":"2026-03-04T13:59","e":"2026-03-04T13:59","src":"Browser","d":"Browser: mail.google.com","b":6},{"s":"2026-03-04T14:10","e":"2026-03-04T14:10","src":"Email","d":"Sent: Re: Stakeholder map (Person 3)","b":6},{"s":"2026-03-04T14:18","e":"2026-03-04T14:18","src":"Browser","d":"Browser: claude.ai","b":6},{"s":"2026-03-04T14:30","e":"2026-03-04T14:30","src":"Slack","d":"#client-a-team","b":6},{"s":"2026-03-04T14:34","e":"2026-03-04T14:34","src":"Drive","d":"Discovery questionnaire saved","b":6},{"s":"2026-03-04T14:49","e":"2026-03-04T14:49","src":"Browser","d":"Browser: docs.google.com","b":6},{"s":"2026-03-04T14:55","e":"2026-03-04T14:55","src":"Browser","d":"Browser: app.slack.com","b":6},{"s":"2026-03-04T14:55","e":"2026-03-04T14:55","src":"Drive","d":"SOW redline saved","b":6},{"s":"2026-03-04T15:00","e":"2026-03-04T16:00","src":"Meeting","d":"Client A steering deck review","b":6},{"s":"2026-03-04T15:09","e":"2026-03-04T15:09","src":"Slack","d":"DM Person 1","b":6},{"s":"2026-03-04T15:18","e":"2026-03-04T15:18","src":"Email","d":"Sent: Steering deck outline (Person 3)","b":6},{"s":"2026-03-04T15:20","e":"2026-03-04T15:20","src":"Browser","d":"Browser: calendar.google.com","b":6},{"s":"2026-03-04T15:31","e":"2026-03-04T15:31","src":"Browser","d":"Browser: client-a.example.com","b":6},{"s":"2026-03-04T15:38","e":"2026-03-04T15:38","src":"Drive","d":"RACI draft saved","b":6},{"s":"2026-03-04T15:49","e":"2026-03-04T15:49","src":"Browser","d":"Browser: docs.google.com","b":6},{"s":"2026-03-05T08:49","e":"2026-03-05T08:49","src":"Browser","d":"Browser: client-a.example.com","b":7},{"s":"2026-03-05T08:52","e":"2026-03-05T08:52","src":"Slack","d":"#client-a-team","b":7},{"s":"2026-03-05T08:55","e":"2026-03-05T08:55","src":"Email","d":"Sent: Re: Stakeholder map (Person 3)","b":7},{"s":"2026-03-05T08:58","e":"2026-03-05T08:58","src":"Slack","d":"Group DM (Person 1, Person 3)","b":7},{"s":"2026-03-05T08:58","e":"2026-03-05T08:58","src":"Browser","d":"Browser: mail.google.com","b":7},{"s":"2026-03-05T09:04","e":"2026-03-05T09:04","src":"Browser","d":"Browser: app.slack.com","b":7},{"s":"2026-03-05T09:06","e":"2026-03-05T09:06","src":"Browser","d":"Browser: claude.ai","b":7},{"s":"2026-03-05T09:10","e":"2026-03-05T09:10","src":"Slack","d":"#client-a-team","b":7},{"s":"2026-03-05T09:11","e":"2026-03-05T09:11","src":"Browser","d":"Browser: client-a.example.com","b":7},{"s":"2026-03-05T09:15","e":"2026-03-05T09:15","src":"Slack","d":"DM Person 1","b":7},{"s":"2026-03-05T09:20","e":"2026-03-05T09:20","src":"Drive","d":"RACI draft saved","b":7},{"s":"2026-03-05T09:29","e":"2026-03-05T09:29","src":"Browser","d":"Browser: claude.ai","b":7},{"s":"2026-03-05T09:30","e":"2026-03-05T09:45","src":"Meeting","d":"Client A daily stand-up","b":7},{"s":"2026-03-05T10:59","e":"2026-03-05T10:59","src":"Browser","d":"Browser: client-a.example.com","b":8},{"s":"2026-03-05T11:00","e":"2026-03-05T12:00","src":"Meeting","d":"Client A stakeholder interviews","b":8},{"s":"2026-03-05T11:05","e":"2026-03-05T11:05","src":"Browser","d":"Browser: portal.client-a.example.com","b":8},{"s":"2026-03-05T13:20","e":"2026-03-05T13:20","src":"Browser","d":"Browser: app.slack.com","b":9},{"s":"2026-03-05T13:32","e":"2026-03-05T13:50","src":"Meeting (inferred)","d":"Chat call with Person 2","b":9},{"s":"2026-03-05T13:35","e":"2026-03-05T13:35","src":"Browser","d":"Browser: app.slack.com","b":9},{"s":"2026-03-05T14:13","e":"2026-03-05T14:13","src":"Drive","d":"RAID log updated","b":9},{"s":"2026-03-05T14:15","e":"2026-03-05T14:15","src":"Browser","d":"Browser: mail.google.com","b":9},{"s":"2026-03-05T14:18","e":"2026-03-05T14:18","src":"Browser","d":"Browser: client-a.example.com","b":9},{"s":"2026-03-05T14:21","e":"2026-03-05T14:21","src":"Browser","d":"Browser: claude.ai","b":9},{"s":"2026-03-05T14:25","e":"2026-03-05T14:25","src":"Email","d":"Sent: Interview schedule for next week (Client Contact 1)","b":9},{"s":"2026-03-05T14:30","e":"2026-03-05T14:30","src":"Browser","d":"Browser: app.slack.com","b":9},{"s":"2026-03-05T14:30","e":"2026-03-05T14:30","src":"Browser","d":"Browser: docs.google.com","b":9},{"s":"2026-03-05T14:33","e":"2026-03-05T14:33","src":"Browser","d":"Browser: client-a.example.com","b":9},{"s":"2026-03-05T14:35","e":"2026-03-05T14:35","src":"Drive","d":"SOW redline saved","b":9},{"s":"2026-03-05T14:36","e":"2026-03-05T14:36","src":"Browser","d":"Browser: portal.client-a.example.com","b":9},{"s":"2026-03-05T14:41","e":"2026-03-05T14:41","src":"Browser","d":"Browser: calendar.google.com","b":9},{"s":"2026-03-05T14:45","e":"2026-03-05T14:45","src":"Drive","d":"Stakeholder map saved","b":9},{"s":"2026-03-05T14:47","e":"2026-03-05T14:47","src":"Browser","d":"Browser: client-a.example.com","b":9},{"s":"2026-03-05T14:47","e":"2026-03-05T14:47","src":"Browser","d":"Browser: claude.ai","b":9},{"s":"2026-03-06T09:02","e":"2026-03-06T09:02","src":"Browser","d":"Browser: claude.ai","b":10},{"s":"2026-03-06T09:06","e":"2026-03-06T09:06","src":"Browser","d":"Browser: app.slack.com","b":10},{"s":"2026-03-06T09:08","e":"2026-03-06T09:08","src":"Slack","d":"#client-a-team","b":10},{"s":"2026-03-06T09:11","e":"2026-03-06T09:11","src":"Browser","d":"Browser: client-a.example.com","b":10},{"s":"2026-03-06T09:13","e":"2026-03-06T09:13","src":"Slack","d":"#client-a-team","b":10},{"s":"2026-03-06T09:18","e":"2026-03-06T09:18","src":"Browser","d":"Browser: portal.client-a.example.com","b":10},{"s":"2026-03-06T09:23","e":"2026-03-06T09:23","src":"Browser","d":"Browser: calendar.google.com","b":10},{"s":"2026-03-06T09:23","e":"2026-03-06T09:23","src":"Email","d":"Sent: Re: Kickoff agenda (Client Contact 1)","b":10},{"s":"2026-03-06T09:25","e":"2026-03-06T09:25","src":"Browser","d":"Browser: app.slack.com","b":10},{"s":"2026-03-06T09:28","e":"2026-03-06T09:28","src":"Drive","d":"Discovery questionnaire saved","b":10},{"s":"2026-03-06T09:30","e":"2026-03-06T09:45","src":"Meeting","d":"Client A daily stand-up","b":10},{"s":"2026-03-06T09:33","e":"2026-03-06T09:33","src":"Browser","d":"Browser: claude.ai","b":10},{"s":"2026-03-06T09:35","e":"2026-03-06T09:35","src":"Browser","d":"Browser: calendar.google.com","b":10},{"s":"2026-03-06T09:38","e":"2026-03-06T09:38","src":"Browser","d":"Browser: app.slack.com","b":10},{"s":"2026-03-06T09:42","e":"2026-03-06T09:42","src":"Browser","d":"Browser: portal.client-a.example.com","b":10},{"s":"2026-03-06T09:47","e":"2026-03-06T09:47","src":"Drive","d":"Discovery questionnaire saved","b":10},{"s":"2026-03-06T14:17","e":"2026-03-06T14:17","src":"Browser","d":"Browser: portal.client-a.example.com","b":11},{"s":"2026-03-06T14:18","e":"2026-03-06T14:18","src":"Drive","d":"RAID log updated","b":11},{"s":"2026-03-06T14:21","e":"2026-03-06T14:21","src":"Browser","d":"Browser: client-a.example.com","b":11},{"s":"2026-03-06T14:35","e":"2026-03-06T14:35","src":"Browser","d":"Browser: calendar.google.com","b":11},{"s":"2026-03-06T14:38","e":"2026-03-06T14:38","src":"Browser","d":"Browser: app.slack.com","b":11},{"s":"2026-03-06T14:39","e":"2026-03-06T14:39","src":"Slack","d":"#client-a-team","b":11},{"s":"2026-03-06T14:52","e":"2026-03-06T14:52","src":"Browser","d":"Browser: mail.google.com","b":11},{"s":"2026-03-06T15:01","e":"2026-03-06T15:01","src":"Email","d":"Sent: Re: Stakeholder map (Person 3)","b":11},{"s":"2026-03-06T15:09","e":"2026-03-06T15:09","src":"Browser","d":"Browser: client-a.example.com","b":11},{"s":"2026-03-06T15:18","e":"2026-03-06T15:18","src":"Slack","d":"DM Person 2","b":11},{"s":"2026-03-06T15:30","e":"2026-03-06T15:30","src":"Browser","d":"Browser: mail.google.com","b":11},{"s":"2026-03-06T15:54","e":"2026-03-06T15:54","src":"Browser","d":"Browser: app.slack.com","b":11},{"s":"2026-03-06T16:00","e":"2026-03-06T17:00","src":"Meeting","d":"Firm onboarding: training session","b":11},{"s":"2026-03-06T17:20","e":"2026-03-06T17:20","src":"Drive","d":"Weekly timesheet notes saved [Admin]","b":11},{"s":"2026-03-06T17:24","e":"2026-03-06T17:24","src":"Browser","d":"Browser: calendar.google.com","b":11},{"s":"2026-03-06T17:31","e":"2026-03-06T17:31","src":"Browser","d":"Browser: claude.ai","b":11},{"s":"2026-03-09T09:09","e":"2026-03-09T09:09","src":"Slack","d":"DM Person 2","b":12},{"s":"2026-03-09T09:12","e":"2026-03-09T09:12","src":"Browser","d":"Browser: calendar.google.com","b":12},{"s":"2026-03-09T09:15","e":"2026-03-09T09:15","src":"Slack","d":"Group DM (Person 1, Person 3)","b":12},{"s":"2026-03-09T09:18","e":"2026-03-09T09:18","src":"Browser","d":"Browser: portal.client-a.example.com","b":12},{"s":"2026-03-09T09:21","e":"2026-03-09T09:21","src":"Slack","d":"#client-a-team","b":12},{"s":"2026-03-09T09:26","e":"2026-03-09T09:26","src":"Browser","d":"Browser: docs.google.com","b":12},{"s":"2026-03-09T09:30","e":"2026-03-09T09:45","src":"Meeting","d":"Client A daily stand-up","b":12},{"s":"2026-03-09T09:45","e":"2026-03-09T09:45","src":"Slack","d":"Group DM (Person 1, Person 3)","b":12},{"s":"2026-03-09T09:55","e":"2026-03-09T09:55","src":"Browser","d":"Browser: portal.client-a.example.com","b":12},{"s":"2026-03-09T09:57","e":"2026-03-09T09:57","src":"Browser","d":"Browser: docs.google.com","b":12},{"s":"2026-03-09T10:02","e":"2026-03-09T10:02","src":"Slack","d":"DM Person 2","b":12},{"s":"2026-03-09T14:19","e":"2026-03-09T14:19","src":"Browser","d":"Browser: app.slack.com","b":13},{"s":"2026-03-09T14:23","e":"2026-03-09T14:23","src":"Browser","d":"Browser: docs.google.com","b":13},{"s":"2026-03-09T14:25","e":"2026-03-09T14:25","src":"Slack","d":"#client-a-team","b":13},{"s":"2026-03-09T14:28","e":"2026-03-09T14:28","src":"Browser","d":"Browser: app.slack.com","b":13},{"s":"2026-03-09T14:29","e":"2026-03-09T14:29","src":"Drive","d":"SOW redline saved","b":13},{"s":"2026-03-09T14:32","e":"2026-03-09T14:32","src":"Browser","d":"Browser: claude.ai","b":13},{"s":"2026-03-09T14:40","e":"2026-03-09T14:40","src":"Slack","d":"DM Person 1","b":13},{"s":"2026-03-09T14:56","e":"2026-03-09T14:56","src":"Browser","d":"Browser: client-a.example.com","b":13},{"s":"2026-03-09T14:59","e":"2026-03-09T14:59","src":"Slack","d":"DM Person 1","b":13},{"s":"2026-03-09T15:04","e":"2026-03-09T15:04","src":"Slack","d":"DM Person 2","b":13},{"s":"2026-03-09T15:10","e":"2026-03-09T15:10","src":"Browser","d":"Browser: docs.google.com","b":13},{"s":"2026-03-09T15:20","e":"2026-03-09T15:20","src":"Slack","d":"DM Person 1","b":13},{"s":"2026-03-09T15:25","e":"2026-03-09T15:25","src":"Browser","d":"Browser: app.slack.com","b":13},{"s":"2026-03-09T15:33","e":"2026-03-09T15:33","src":"Email","d":"Sent: Re: Stakeholder map (Person 3)","b":13},{"s":"2026-03-09T15:41","e":"2026-03-09T15:41","src":"Slack","d":"#client-a-team","b":13},{"s":"2026-03-09T15:43","e":"2026-03-09T15:43","src":"Browser","d":"Browser: claude.ai","b":13},{"s":"2026-03-09T15:45","e":"2026-03-09T15:45","src":"Browser","d":"Browser: app.slack.com","b":13},{"s":"2026-03-09T15:46","e":"2026-03-09T15:46","src":"Email","d":"Sent: Re: Kickoff agenda (Client Contact 1)","b":13},{"s":"2026-03-09T15:47","e":"2026-03-09T15:47","src":"Browser","d":"Browser: docs.google.com","b":13},{"s":"2026-03-09T15:47","e":"2026-03-09T15:47","src":"Browser","d":"Browser: calendar.google.com","b":13},{"s":"2026-03-10T04:02","e":"2026-03-10T04:02","src":"Browser","d":"Browser: docs.google.com","b":14},{"s":"2026-03-10T04:02","e":"2026-03-10T04:02","src":"Browser","d":"Browser: calendar.google.com","b":14},{"s":"2026-03-10T04:02","e":"2026-03-10T04:02","src":"Browser","d":"Browser: client-a.example.com","b":14},{"s":"2026-03-10T04:02","e":"2026-03-10T04:02","src":"Browser","d":"Browser: app.slack.com","b":14},{"s":"2026-03-10T04:02","e":"2026-03-10T04:02","src":"Browser","d":"Browser: mail.google.com","b":14},{"s":"2026-03-10T08:54","e":"2026-03-10T08:54","src":"Email","d":"Sent: VPN access request (Client Contact 2)","b":15},{"s":"2026-03-10T08:58","e":"2026-03-10T08:58","src":"Drive","d":"Discovery questionnaire saved","b":15},{"s":"2026-03-10T09:01","e":"2026-03-10T09:01","src":"Browser","d":"Browser: client-a.example.com","b":15},{"s":"2026-03-10T09:02","e":"2026-03-10T09:02","src":"Browser","d":"Browser: calendar.google.com","b":15},{"s":"2026-03-10T09:06","e":"2026-03-10T09:06","src":"Slack","d":"DM Person 2","b":15},{"s":"2026-03-10T09:16","e":"2026-03-10T09:16","src":"Slack","d":"#client-a-team","b":15},{"s":"2026-03-10T09:18","e":"2026-03-10T09:18","src":"Browser","d":"Browser: app.slack.com","b":15},{"s":"2026-03-10T09:30","e":"2026-03-10T09:45","src":"Meeting","d":"Client A daily stand-up","b":15},{"s":"2026-03-10T10:57","e":"2026-03-10T10:57","src":"Browser","d":"Browser: mail.google.com","b":16},{"s":"2026-03-10T10:57","e":"2026-03-10T10:57","src":"Browser","d":"Browser: calendar.google.com","b":16},{"s":"2026-03-10T11:00","e":"2026-03-10T12:00","src":"Meeting","d":"Client A stakeholder interviews","b":16},{"s":"2026-03-10T11:10","e":"2026-03-10T11:10","src":"Browser","d":"Browser: app.slack.com","b":16},{"s":"2026-03-10T12:20","e":"2026-03-10T12:20","src":"Slack","d":"DM Person 4 [Personal]","b":16},{"s":"2026-03-10T12:31","e":"2026-03-10T12:31","src":"Browser","d":"Browser: claude.ai","b":16},{"s":"2026-03-10T12:35","e":"2026-03-10T12:35","src":"Slack","d":"DM Person 4 [Personal]","b":16},{"s":"2026-03-10T12:50","e":"2026-03-10T12:50","src":"Email","d":"Sent: [Personal] Re: Weekend plans (Person 4)","b":16},{"s":"2026-03-10T12:51","e":"2026-03-10T12:51","src":"Browser","d":"Browser: client-a.example.com","b":16},{"s":"2026-03-10T14:02","e":"2026-03-10T14:02","src":"Email","d":"Sent: Interview schedule for next week (Client Contact 1)","b":17},{"s":"2026-03-10T14:10","e":"2026-03-10T14:10","src":"Browser","d":"Browser: calendar.google.com","b":17},{"s":"2026-03-10T14:14","e":"2026-03-10T14:14","src":"Browser","d":"Browser: mail.google.com","b":17},{"s":"2026-03-10T14:24","e":"2026-03-10T14:24","src":"Email","d":"Sent: Re: SOW comments (Person 2)","b":17},{"s":"2026-03-10T14:36","e":"2026-03-10T14:36","src":"Slack","d":"Group DM (Person 1, Person 3)","b":17},{"s":"2026-03-10T14:38","e":"2026-03-10T14:38","src":"Browser","d":"Browser: portal.client-a.example.com","b":17},{"s":"2026-03-10T14:42","e":"2026-03-10T14:42","src":"Browser","d":"Browser: calendar.google.com","b":17},{"s":"2026-03-10T14:43","e":"2026-03-10T14:43","src":"Browser","d":"Browser: claude.ai","b":17},{"s":"2026-03-10T14:43","e":"2026-03-10T14:43","src":"Browser","d":"Browser: client-a.example.com","b":17},{"s":"2026-03-10T14:44","e":"2026-03-10T14:44","src":"Browser","d":"Browser: app.slack.com","b":17},{"s":"2026-03-10T14:47","e":"2026-03-10T14:47","src":"Slack","d":"#client-a-team","b":17},{"s":"2026-03-10T14:49","e":"2026-03-10T14:49","src":"Browser","d":"Browser: app.slack.com","b":17},{"s":"2026-03-10T14:52","e":"2026-03-10T14:52","src":"Browser","d":"Browser: mail.google.com","b":17},{"s":"2026-03-10T15:00","e":"2026-03-10T15:00","src":"Email","d":"Sent: Discovery questionnaire draft (Client Contact 1)","b":17},{"s":"2026-03-10T15:02","e":"2026-03-10T15:02","src":"Browser","d":"Browser: client-a.example.com","b":17},{"s":"2026-03-10T15:04","e":"2026-03-10T15:04","src":"Email","d":"Sent: Discovery questionnaire draft (Client Contact 1)","b":17},{"s":"2026-03-10T15:10","e":"2026-03-10T15:10","src":"Email","d":"Sent: Steering deck outline (Person 3)","b":17},{"s":"2026-03-10T15:11","e":"2026-03-10T15:11","src":"Browser","d":"Browser: client-a.example.com","b":17},{"s":"2026-03-10T15:13","e":"2026-03-10T15:13","src":"Browser","d":"Browser: claude.ai","b":17},{"s":"2026-03-11T08:49","e":"2026-03-11T08:49","src":"Drive","d":"Steering deck v2 saved","b":18},{"s":"2026-03-11T08:55","e":"2026-03-11T08:55","src":"Browser","d":"Browser: claude.ai","b":18},{"s":"2026-03-11T08:57","e":"2026-03-11T08:57","src":"Browser","d":"Browser: client-a.example.com","b":18},{"s":"2026-03-11T09:01","e":"2026-03-11T09:01","src":"Slack","d":"#client-a-team","b":18},{"s":"2026-03-11T09:01","e":"2026-03-11T09:01","src":"Browser","d":"Browser: app.slack.com","b":18},{"s":"2026-03-11T09:02","e":"2026-03-11T09:02","src":"Browser","d":"Browser: claude.ai","b":18},{"s":"2026-03-11T09:04","e":"2026-03-11T09:04","src":"Browser","d":"Browser: app.slack.com","b":18},{"s":"2026-03-11T09:13","e":"2026-03-11T09:13","src":"Email","d":"Sent: Re: Kickoff agenda (Client Contact 1)","b":18},{"s":"2026-03-11T09:14","e":"2026-03-11T09:14","src":"Browser","d":"Browser: calendar.google.com","b":18},{"s":"2026-03-11T09:22","e":"2026-03-11T09:22","src":"Browser","d":"Browser: claude.ai","b":18},{"s":"2026-03-11T09:23","e":"2026-03-11T09:23","src":"Browser","d":"Browser: portal.client-a.example.com","b":18},{"s":"2026-03-11T09:25","e":"2026-03-11T09:25","src":"Drive","d":"Discovery questionnaire saved","b":18},{"s":"2026-03-11T09:27","e":"2026-03-11T09:27","src":"Browser","d":"Browser: app.slack.com","b":18},{"s":"2026-03-11T09:30","e":"2026-03-11T09:45","src":"Meeting","d":"Client A daily stand-up","b":18},{"s":"2026-03-11T09:32","e":"2026-03-11T09:32","src":"Browser","d":"Browser: calendar.google.com","b":18},{"s":"2026-03-11T09:42","e":"2026-03-11T09:42","src":"Browser","d":"Browser: docs.google.com","b":18},{"s":"2026-03-11T13:35","e":"2026-03-11T13:35","src":"Browser","d":"Browser: claude.ai","b":19},{"s":"2026-03-11T13:37","e":"2026-03-11T13:37","src":"Browser","d":"Browser: client-a.example.com","b":19},{"s":"2026-03-11T13:37","e":"2026-03-11T13:37","src":"Drive","d":"RAID log updated","b":19},{"s":"2026-03-11T13:49","e":"2026-03-11T13:49","src":"Slack","d":"#client-a-team","b":19},{"s":"2026-03-11T14:03","e":"2026-03-11T14:03","src":"Slack","d":"Group DM (Person 1, Person 3)","b":19},{"s":"2026-03-11T14:04","e":"2026-03-11T14:04","src":"Browser","d":"Browser: mail.google.com","b":19},{"s":"2026-03-11T14:07","e":"2026-03-11T14:07","src":"Browser","d":"Browser: client-a.example.com","b":19},{"s":"2026-03-11T14:15","e":"2026-03-11T14:15","src":"Browser","d":"Browser: portal.client-a.example.com","b":19},{"s":"2026-03-11T14:56","e":"2026-03-11T14:56","src":"Browser","d":"Browser: mail.google.com","b":20},{"s":"2026-03-11T14:57","e":"2026-03-11T14:57","src":"Browser","d":"Browser: portal.client-a.example.com","b":20},{"s":"2026-03-11T15:00","e":"2026-03-11T16:00","src":"Meeting","d":"Client A steering deck review","b":20},{"s":"2026-03-11T15:12","e":"2026-03-11T15:12","src":"Browser","d":"Browser: mail.google.com","b":20},{"s":"2026-03-12T08:50","e":"2026-03-12T08:50","src":"Browser","d":"Browser: portal.client-a.example.com","b":21},{"s":"2026-03-12T08:59","e":"2026-03-12T08:59","src":"Slack","d":"DM Person 1","b":21},{"s":"2026-03-12T09:06","e":"2026-03-12T09:06","src":"Browser","d":"Browser: mail.google.com","b":21},{"s":"2026-03-12T09:07","e":"2026-03-12T09:07","src":"Browser","d":"Browser: claude.ai","b":21},{"s":"2026-03-12T09:08","e":"2026-03-12T09:08","src":"Browser","d":"Browser: docs.google.com","b":21},{"s":"2026-03-12T09:09","e":"2026-03-12T09:09","src":"Browser","d":"Browser: calendar.google.com","b":21},{"s":"2026-03-12T09:10","e":"2026-03-12T09:10","src":"Slack","d":"Group DM (Person 1, Person 3)","b":21},{"s":"2026-03-12T09:17","e":"2026-03-12T09:17","src":"Email","d":"Sent: Steering deck outline (Person 3)","b":21},{"s":"2026-03-12T09:24","e":"2026-03-12T09:24","src":"Browser","d":"Browser: client-a.example.com","b":21},{"s":"2026-03-12T09:25","e":"2026-03-12T09:25","src":"Browser","d":"Browser: mail.google.com","b":21},{"s":"2026-03-12T09:25","e":"2026-03-12T09:25","src":"Drive","d":"RACI draft saved","b":21},{"s":"2026-03-12T09:28","e":"2026-03-12T09:28","src":"Browser","d":"Browser: mail.google.com","b":21},{"s":"2026-03-12T09:30","e":"2026-03-12T09:45","src":"Meeting","d":"Client A daily stand-up","b":21},{"s":"2026-03-12T09:34","e":"2026-03-12T09:34","src":"Browser","d":"Browser: mail.google.com","b":21},{"s":"2026-03-12T09:35","e":"2026-03-12T09:35","src":"Browser","d":"Browser: client-a.example.com","b":21},{"s":"2026-03-12T09:35","e":"2026-03-12T09:35","src":"Browser","d":"Browser: app.slack.com","b":21},{"s":"2026-03-12T11:00","e":"2026-03-12T12:00","src":"Meeting","d":"Client A stakeholder interviews","b":22},{"s":"2026-03-12T14:01","e":"2026-03-12T14:01","src":"Email","d":"Sent: Re: SOW comments (Person 2)","b":23},{"s":"2026-03-12T14:02","e":"2026-03-12T14:02","src":"Browser","d":"Browser: claude.ai","b":23},{"s":"2026-03-12T14:11","e":"2026-03-12T14:11","src":"Browser","d":"Browser: portal.client-a.example.com","b":23},{"s":"2026-03-12T14:13","e":"2026-03-12T14:13","src":"Browser","d":"Browser: claude.ai","b":23},{"s":"2026-03-12T14:20","e":"2026-03-12T14:20","src":"Browser","d":"Browser: client-a.example.com","b":23},{"s":"2026-03-12T14:23","e":"2026-03-12T14:23","src":"Browser","d":"Browser: client-a.example.com","b":23},{"s":"2026-03-12T14:23","e":"2026-03-12T14:23","src":"Email","d":"Sent: Interview schedule for next week (Client Contact 1)","b":23},{"s":"2026-03-12T14:31","e":"2026-03-12T14:31","src":"Slack","d":"Group DM (Person 1, Person 3)","b":23},{"s":"2026-03-12T14:34","e":"2026-03-12T14:34","src":"Browser","d":"Browser: calendar.google.com","b":23},{"s":"2026-03-12T14:36","e":"2026-03-12T14:36","src":"Browser","d":"Browser: client-a.example.com","b":23},{"s":"2026-03-13T08:44","e":"2026-03-13T08:44","src":"Browser","d":"Browser: mail.google.com","b":24},{"s":"2026-03-13T08:50","e":"2026-03-13T08:50","src":"Email","d":"Sent: Discovery questionnaire draft (Client Contact 1)","b":24},{"s":"2026-03-13T08:52","e":"2026-03-13T08:52","src":"Browser","d":"Browser: calendar.google.com","b":24},{"s":"2026-03-13T08:53","e":"2026-03-13T08:53","src":"Browser","d":"Browser: portal.client-a.example.com","b":24},{"s":"2026-03-13T08:56","e":"2026-03-13T08:56","src":"Browser","d":"Browser: mail.google.com","b":24},{"s":"2026-03-13T09:04","e":"2026-03-13T09:04","src":"Browser","d":"Browser: portal.client-a.example.com","b":24},{"s":"2026-03-13T09:04","e":"2026-03-13T09:04","src":"Drive","d":"SOW redline saved","b":24},{"s":"2026-03-13T09:07","e":"2026-03-13T09:07","src":"Browser","d":"Browser: claude.ai","b":24},{"s":"2026-03-13T09:18","e":"2026-03-13T09:18","src":"Browser","d":"Browser: claude.ai","b":24},{"s":"2026-03-13T09:18","e":"2026-03-13T09:18","src":"Browser","d":"Browser: mail.google.com","b":24},{"s":"2026-03-13T09:20","e":"2026-03-13T09:20","src":"Drive","d":"Interview notes saved","b":24},{"s":"2026-03-13T09:22","e":"2026-03-13T09:22","src":"Browser","d":"Browser: app.slack.com","b":24},{"s":"2026-03-13T09:23","e":"2026-03-13T09:23","src":"Browser","d":"Browser: mail.google.com","b":24},{"s":"2026-03-13T09:27","e":"2026-03-13T09:27","src":"Drive","d":"RAID log updated","b":24},{"s":"2026-03-13T09:29","e":"2026-03-13T09:29","src":"Browser","d":"Browser: client-a.example.com","b":24},{"s":"2026-03-13T09:30","e":"2026-03-13T09:45","src":"Meeting","d":"Client A daily stand-up","b":24},{"s":"2026-03-13T09:31","e":"2026-03-13T09:31","src":"Browser","d":"Browser: portal.client-a.example.com","b":24},{"s":"2026-03-13T14:10","e":"2026-03-13T14:10","src":"Browser","d":"Browser: portal.client-a.example.com","b":25},{"s":"2026-03-13T14:12","e":"2026-03-13T14:12","src":"Browser","d":"Browser: docs.google.com","b":25},{"s":"2026-03-13T14:12","e":"2026-03-13T14:12","src":"Drive","d":"Steering deck v2 saved","b":25},{"s":"2026-03-13T14:29","e":"2026-03-13T14:29","src":"Browser","d":"Browser: portal.client-a.example.com","b":25},{"s":"2026-03-13T14:29","e":"2026-03-13T14:29","src":"Drive","d":"SOW redline saved","b":25},{"s":"2026-03-13T14:30","e":"2026-03-13T14:30","src":"Browser","d":"Browser: portal.client-a.example.com","b":25},{"s":"2026-03-13T14:38","e":"2026-03-13T14:38","src":"Browser","d":"Browser: client-a.example.com","b":25},{"s":"2026-03-13T14:40","e":"2026-03-13T14:40","src":"Slack","d":"DM Person 2","b":25},{"s":"2026-03-13T14:45","e":"2026-03-13T14:45","src":"Browser","d":"Browser: client-a.example.com","b":25},{"s":"2026-03-13T14:49","e":"2026-03-13T14:49","src":"Browser","d":"Browser: calendar.google.com","b":25},{"s":"2026-03-13T16:00","e":"2026-03-13T17:00","src":"Meeting","d":"Firm onboarding: training session","b":26},{"s":"2026-03-13T16:11","e":"2026-03-13T16:11","src":"Browser","d":"Browser: app.slack.com","b":26},{"s":"2026-03-13T17:20","e":"2026-03-13T17:20","src":"Drive","d":"Weekly timesheet notes saved [Admin]","b":26},{"s":"2026-03-16T09:10","e":"2026-03-16T09:10","src":"Slack","d":"DM Person 1","b":27},{"s":"2026-03-16T09:12","e":"2026-03-16T09:12","src":"Browser","d":"Browser: calendar.google.com","b":27},{"s":"2026-03-16T09:13","e":"2026-03-16T09:13","src":"Browser","d":"Browser: calendar.google.com","b":27},{"s":"2026-03-16T09:17","e":"2026-03-16T09:17","src":"Browser","d":"Browser: calendar.google.com","b":27},{"s":"2026-03-16T09:24","e":"2026-03-16T09:24","src":"Slack","d":"#client-a-team","b":27},{"s":"2026-03-16T09:30","e":"2026-03-16T09:45","src":"Meeting","d":"Client A daily stand-up","b":27},{"s":"2026-03-16T09:31","e":"2026-03-16T09:31","src":"Browser","d":"Browser: mail.google.com","b":27},{"s":"2026-03-16T09:34","e":"2026-03-16T09:34","src":"Browser","d":"Browser: client-a.example.com","b":27},{"s":"2026-03-16T14:03","e":"2026-03-16T14:03","src":"Browser","d":"Browser: docs.google.com","b":28},{"s":"2026-03-16T14:10","e":"2026-03-16T14:10","src":"Slack","d":"DM Person 2","b":28},{"s":"2026-03-16T14:14","e":"2026-03-16T14:14","src":"Browser","d":"Browser: app.slack.com","b":28},{"s":"2026-03-16T14:22","e":"2026-03-16T14:22","src":"Slack","d":"#client-a-team","b":28},{"s":"2026-03-16T14:25","e":"2026-03-16T14:25","src":"Browser","d":"Browser: client-a.example.com","b":28},{"s":"2026-03-16T14:26","e":"2026-03-16T14:26","src":"Browser","d":"Browser: claude.ai","b":28},{"s":"2026-03-16T14:29","e":"2026-03-16T14:29","src":"Browser","d":"Browser: mail.google.com","b":28},{"s":"2026-03-16T14:38","e":"2026-03-16T14:38","src":"Drive","d":"SOW redline saved","b":28},{"s":"2026-03-16T14:40","e":"2026-03-16T14:40","src":"Browser","d":"Browser: portal.client-a.example.com","b":28},{"s":"2026-03-16T14:52","e":"2026-03-16T14:52","src":"Browser","d":"Browser: app.slack.com","b":28},{"s":"2026-03-16T14:56","e":"2026-03-16T14:56","src":"Browser","d":"Browser: client-a.example.com","b":28},{"s":"2026-03-16T14:58","e":"2026-03-16T14:58","src":"Browser","d":"Browser: calendar.google.com","b":28},{"s":"2026-03-16T14:59","e":"2026-03-16T14:59","src":"Slack","d":"DM Person 2","b":28},{"s":"2026-03-16T15:03","e":"2026-03-16T15:03","src":"Browser","d":"Browser: app.slack.com","b":28},{"s":"2026-03-16T15:03","e":"2026-03-16T15:03","src":"Browser","d":"Browser: portal.client-a.example.com","b":28},{"s":"2026-03-16T15:06","e":"2026-03-16T15:06","src":"Drive","d":"Steering deck v2 saved","b":28},{"s":"2026-03-16T15:09","e":"2026-03-16T15:09","src":"Browser","d":"Browser: mail.google.com","b":28},{"s":"2026-03-16T15:12","e":"2026-03-16T15:12","src":"Browser","d":"Browser: calendar.google.com","b":28},{"s":"2026-03-16T15:15","e":"2026-03-16T15:15","src":"Email","d":"Sent: Steering deck outline (Person 3)","b":28},{"s":"2026-03-16T15:16","e":"2026-03-16T15:16","src":"Browser","d":"Browser: app.slack.com","b":28},{"s":"2026-03-16T15:21","e":"2026-03-16T15:21","src":"Browser","d":"Browser: client-a.example.com","b":28}],"config":{"gapMinutes":30,"minBlockMinutes":5,"meetingWeight":10,"weeklyAllocationHours":20,"billableLabel":"Client A","adminPattern":"Person 5|Person 6|onboarding|payroll|benefits|tax form|handbook|background check|Laptop setup|IT setup|training|timesheet|time-tracking|\\[Admin","personalPattern":"\\[Personal","neutralPattern":"^Browser: (docs|drive|calendar|mail|accounts|meet|www)\\.google\\.com$|^Browser: (google|gmail)\\.com$|^Browser: (app\\.)?slack\\.com$|^Browser: (outlook\\.office|teams\\.microsoft)\\.com$|^Browser: claude\\.ai$","clientContacts":{"Client Contact 1":"Client Contact 1 (Client A sponsor)","Client Contact 2":"Client Contact 2 (Client A IT)"},"timesheetThemes":[{"label":"deck / slide development","pattern":"deck|slides|presentation"},{"label":"engagement documentation","pattern":"RAID|stakeholder|questionnaire|tracker|discovery|RACI"},{"label":"client access \u0026 provisioning","pattern":"Client Contact 2|access|provision|VPN"},{"label":"client coordination \u0026 scheduling","pattern":"Client Contact 1|schedule|sessions|agenda"},{"label":"scope / SOW review","pattern":"SOW|scope|statement of work"},{"label":"team coordination","pattern":"#client-a|Person 1|Person 2|Person 3"}]},"generated":"2026-10-20 10:17"};
+
+// ---------- config ----------
+const CFG = DATA.config || {};
+const CATS = [
+  { key: 'Billable', label: CFG.billableLabel ? 'Billable (' + CFG.billableLabel + ')' : 'Billable', color: 'var(--c-billable)', field: 'BillableMin' },
+  { key: 'Admin',    label: 'Admin',    color: 'var(--c-admin)',    field: 'AdminMin' },
+  { key: 'Personal', label: 'Personal', color: 'var(--c-personal)', field: 'PersonalMin' },
+  { key: 'Unclear',  label: 'Unclear',  color: 'var(--c-unclear)',  field: 'UnclearMin' },
+];
+const SRC_COLORS = ['var(--s1)','var(--s2)','var(--s3)','var(--s4)','var(--s5)','var(--s6)','var(--s7)'];
+const rx = p => { try { return p ? new RegExp(p, 'i') : null; } catch (e) { return null; } };
+const ADMIN = rx(CFG.adminPattern), PERSONAL = rx(CFG.personalPattern), NEUTRAL = rx(CFG.neutralPattern);
+const CONTACTS = CFG.clientContacts || {};
+const THEMES = (CFG.timesheetThemes || []).map(t => ({ label: t.label, re: rx(t.pattern) })).filter(t => t.re);
+const ALLOC = Number(CFG.weeklyAllocationHours) || 0;
+
+// ---------- helpers ----------
+const blocks = (DATA.blocks || []).map((b, i) => ({ ...b, i }));
+const events = DATA.events || [];
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const h = m => (m / 60).toFixed(1);
+const toMin = hhmm => { const [a, b] = hhmm.split(':').map(Number); return a * 60 + b; };
+const parseD = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const fmtD = s => parseD(s).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+const majority = cat => (cat || 'Unclear').split(' ')[0];
+const catOf = d => (PERSONAL && PERSONAL.test(d)) ? 'Personal' : (ADMIN && ADMIN.test(d)) ? 'Admin' : 'Billable';
+const dates = [...new Set(blocks.map(b => b.Date))].sort();
+const sum = (arr, f) => arr.reduce((a, x) => a + (Number(typeof f === 'function' ? f(x) : x[f]) || 0), 0);
+const width = id => Math.max(320, document.getElementById(id).clientWidth);
+const usedCats = CATS.filter(c => sum(blocks, c.field) > 0);
+const svg = (w, hgt, body) => `<svg viewBox="0 0 ${w} ${hgt}" width="${w}" height="${hgt}" role="img">${body}</svg>`;
+const rect = (x, y, w, hh, color, tip, extra = '') =>
+  `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${Math.max(0, w).toFixed(1)}" height="${Math.max(0, hh).toFixed(1)}" rx="2" style="fill:${color}" data-tip="${esc(tip)}" ${extra}/>`;
+const niceStep = v => { if (v <= 0) return 1; const p = Math.pow(10, Math.floor(Math.log10(v))); for (const m of [1, 2, 2.5, 5, 10]) if (m * p >= v) return m * p; return 10 * p; };
+// Axis with ~4 round-number ticks: { max, step }
+const axis = v => { const step = niceStep(Math.max(v, 0.01) / 4); return { max: Math.ceil(Math.max(v, 0.01) / step) * step, step }; };
+const tickLabel = t => String(+t.toFixed(2));
+
+function legend(el, items) {
+  el.innerHTML = items.map(it => `<span><i style="background:${it.color}"></i>${esc(it.label)}</span>`).join('');
+}
+document.querySelectorAll('[data-legend="cats"]').forEach(el => legend(el, usedCats));
+
+// ---------- tiles ----------
+function tiles() {
+  const total = sum(blocks, 'Minutes'), bill = sum(blocks, 'BillableMin');
+  const byDay = {}; blocks.forEach(b => byDay[b.Date] = (byDay[b.Date] || 0) + b.Minutes);
+  const busiest = Object.entries(byDay).sort((a, b) => b[1] - a[1])[0];
+  const meetings = events.filter(e => /^Meeting/.test(e.src)).length;
+  const longest = blocks.reduce((a, b) => (b.Minutes > (a ? a.Minutes : -1) ? b : a), null);
+  const t = [
+    [h(total) + ' h', 'Total active time'],
+    [h(bill) + ' h', 'Billable · ' + (total ? Math.round(100 * bill / total) : 0) + '% of active'],
+    [busiest ? h(busiest[1]) + ' h' : '–', 'Busiest day' + (busiest ? ' · ' + fmtD(busiest[0]) : '')],
+    [meetings, 'Meetings'],
+    [events.length, 'Signals'],
+    [longest ? h(longest.Minutes) + ' h' : '–', 'Longest block' + (longest ? ' · ' + fmtD(longest.Date) : '')],
+  ];
+  document.getElementById('tiles').innerHTML = t.map(([v, l]) => `<div class="tile"><div class="v">${esc(v)}</div><div class="l">${esc(l)}</div></div>`).join('');
+  document.getElementById('range').textContent = dates.length
+    ? `${fmtD(dates[0])} – ${fmtD(dates[dates.length - 1])} · generated ${DATA.generated || ''} · all figures are lower bounds`
+    : 'No data';
+}
+
+// ---------- weekly ----------
+function weekly() {
+  const weeks = {};
+  blocks.forEach(b => {
+    const d = parseD(b.Date); const mon = new Date(d); mon.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+    const k = mon.toISOString().slice(0, 10);
+    (weeks[k] = weeks[k] || { k, mon, days: new Set(), mins: {} }).days.add(b.Date);
+    usedCats.forEach(c => weeks[k].mins[c.key] = (weeks[k].mins[c.key] || 0) + (b[c.field] || 0));
+  });
+  const ws = Object.values(weeks).sort((a, b) => a.mon - b.mon);
+  const lastDate = parseD(dates[dates.length - 1] || '2000-01-01');
+  const W = width('weekly'), L = 130, R = 50, row = 30, top = 6, H = top + ws.length * row + 22;
+  const ax = axis(Math.max(ALLOC, ...ws.map(w => sum(Object.values(w.mins), x => x) / 60))), maxH = ax.max;
+  const x = v => L + (W - L - R) * v / maxH;
+  let g = '';
+  for (let t = 0; t <= maxH + 1e-9; t += ax.step) g += `<line x1="${x(t)}" x2="${x(t)}" y1="${top}" y2="${H - 20}" style="stroke:var(--grid)"/><text x="${x(t)}" y="${H - 6}" text-anchor="middle">${tickLabel(t)}h</text>`;
+  ws.forEach((w, i) => {
+    const y = top + i * row + 4; let cx = L;
+    const end = new Date(w.mon); end.setDate(end.getDate() + 6);
+    const partial = end > lastDate;
+    g += `<text x="${L - 8}" y="${y + 15}" text-anchor="end">Week of ${w.mon.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}${partial ? ' (partial)' : ''}</text>`;
+    usedCats.forEach(c => {
+      const m = w.mins[c.key] || 0; if (!m) return;
+      const bw = x(m / 60) - L;
+      g += rect(cx, y, Math.max(0, bw - 2), row - 10, c.color, `${c.label}: ${h(m)} h`); cx += bw;
+    });
+    g += `<text class="val" x="${cx + 4}" y="${y + 15}">${h(sum(Object.values(w.mins), v => v))}h</text>`;
+  });
+  if (ALLOC) g += `<line x1="${x(ALLOC)}" x2="${x(ALLOC)}" y1="${top - 4}" y2="${H - 20}" style="stroke:var(--ink)" stroke-dasharray="4 3"/>`;
+  document.getElementById('weekly').innerHTML = svg(W, H, g);
+  document.getElementById('weeklySub').textContent = ALLOC
+    ? `Monday–Sunday weeks. The dashed line is the ${ALLOC}-hour weekly allocation.`
+    : 'Monday–Sunday weeks.';
+}
+
+// ---------- daily stacked columns ----------
+function daily() {
+  const W = width('daily'), L = 40, B = 34, T = 16, H = 240;
+  const per = dates.map(d => { const bs = blocks.filter(b => b.Date === d); const o = { d }; usedCats.forEach(c => o[c.key] = sum(bs, c.field)); o.total = sum(bs, 'Minutes'); return o; });
+  const ax = axis(Math.max(1, ...per.map(p => p.total / 60))), maxH = ax.max;
+  const y = v => T + (H - T - B) * (1 - v / maxH);
+  const slot = (W - L) / Math.max(1, per.length), bw = Math.min(42, slot * 0.62);
+  let g = '';
+  for (let t = 0; t <= maxH + 1e-9; t += ax.step) g += `<line x1="${L}" x2="${W}" y1="${y(t)}" y2="${y(t)}" style="stroke:var(--grid)"/><text x="${L - 6}" y="${y(t) + 4}" text-anchor="end">${tickLabel(t)}h</text>`;
+  per.forEach((p, i) => {
+    const cx = L + slot * i + (slot - bw) / 2; let acc = 0;
+    usedCats.forEach(c => {
+      const m = p[c.key]; if (!m) return;
+      const y0 = y((acc + m) / 60), y1 = y(acc / 60);
+      g += rect(cx, y0, bw, Math.max(0, y1 - y0 - 2), c.color, `${fmtD(p.d)}\n${c.label}: ${h(m)} h`); acc += m;
+    });
+    g += `<text class="val" x="${cx + bw / 2}" y="${y(p.total / 60) - 5}" text-anchor="middle">${h(p.total)}</text>`;
+    const dd = parseD(p.d);
+    g += `<text x="${cx + bw / 2}" y="${H - 18}" text-anchor="middle">${dd.toLocaleDateString(undefined, { weekday: 'short' })}</text><text x="${cx + bw / 2}" y="${H - 5}" text-anchor="middle">${dd.getMonth() + 1}/${dd.getDate()}</text>`;
+  });
+  document.getElementById('daily').innerHTML = svg(W, H, g);
+}
+
+// ---------- gantt ----------
+function gantt() {
+  const W = width('gantt'), L = 96, R = 10, row = 24, T = 4;
+  const startH = Math.min(8, ...blocks.map(b => Math.floor(toMin(b.Start) / 60)));
+  const endH = Math.max(18, ...blocks.map(b => Math.ceil((toMin(b.Start) + b.Minutes) / 60)));
+  const H = T + dates.length * row + 22;
+  const x = m => L + (W - L - R) * (m - startH * 60) / ((endH - startH) * 60);
+  let g = '';
+  for (let hr = startH; hr <= endH; hr++) {
+    g += `<line x1="${x(hr * 60)}" x2="${x(hr * 60)}" y1="${T}" y2="${H - 20}" style="stroke:var(--grid)"/>`;
+    if ((endH - startH) <= 14 || hr % 2 === 0) g += `<text x="${x(hr * 60)}" y="${H - 6}" text-anchor="middle">${((hr + 11) % 12) + 1}${hr < 12 || hr === 24 ? 'a' : 'p'}</text>`;
+  }
+  dates.forEach((d, i) => {
+    const y = T + i * row;
+    g += `<text x="${L - 8}" y="${y + 15}" text-anchor="end">${esc(fmtD(d))}</text>`;
+    blocks.filter(b => b.Date === d).forEach(b => {
+      const c = CATS.find(c => c.key === majority(b.Category)) || CATS[3];
+      const s = toMin(b.Start);
+      const tip = `${b.Start}–${b.End} · ${h(b.Minutes)} h · ${b.Category}` + (b.Meetings ? `\nMeetings: ${b.Meetings}` : '') + (b.Activity ? `\nActivity: ${b.Activity}` : '');
+      g += rect(x(s), y + 4, Math.max(3, x(s + b.Minutes) - x(s)), row - 8, c.color, tip);
+    });
+  });
+  document.getElementById('gantt').innerHTML = svg(W, H, g);
+}
+
+// ---------- heatmap ----------
+function heat() {
+  const counts = {}; let max = 0;
+  events.forEach(e => { const k = e.s.slice(0, 10) + '|' + Number(e.s.slice(11, 13)); counts[k] = (counts[k] || 0) + 1; max = Math.max(max, counts[k]); });
+  const hours = events.map(e => Number(e.s.slice(11, 13)));
+  const h0 = Math.min(7, ...hours), h1 = Math.max(19, ...hours);
+  const W = width('heat'), L = 96, T = 4, cell = Math.min(34, (W - L) / (h1 - h0 + 1)), row = 20, H = T + dates.length * row + 20;
+  const ramp = ['var(--heat0)', 'var(--heat1)', 'var(--heat2)', 'var(--heat3)', 'var(--heat4)'];
+  let g = '';
+  dates.forEach((d, i) => {
+    const y = T + i * row;
+    g += `<text x="${L - 8}" y="${y + 14}" text-anchor="end">${esc(fmtD(d))}</text>`;
+    for (let hr = h0; hr <= h1; hr++) {
+      const n = counts[d + '|' + hr] || 0;
+      const lvl = n === 0 ? 0 : Math.min(4, 1 + Math.floor(3 * n / Math.max(1, max)));
+      g += rect(L + (hr - h0) * cell + 1, y + 1, cell - 2, row - 2, ramp[lvl], `${fmtD(d)} ${hr}:00 – ${n} signal${n === 1 ? '' : 's'}`);
+    }
+  });
+  for (let hr = h0; hr <= h1; hr += 2) g += `<text x="${L + (hr - h0) * cell + cell / 2}" y="${H - 4}" text-anchor="middle">${((hr + 11) % 12) + 1}${hr < 12 ? 'a' : 'p'}</text>`;
+  document.getElementById('heat').innerHTML = svg(W, H, g);
+}
+
+// ---------- people ----------
+function people() {
+  const P = {};
+  const add = (name, kind) => { name = name.trim(); if (!name || /^me$/i.test(name)) return; (P[name] = P[name] || { chat: 0, email: 0 })[kind]++; };
+  events.forEach(e => {
+    if (e.src === 'Email') { const m = e.d.match(/\(([^()]+)\)\s*$/); if (m) m[1].split(/,\s*/).forEach(n => add(n, 'email')); }
+    else if (e.src === 'Slack' || e.src === 'Chat') {
+      let m;
+      if ((m = e.d.match(/^DM ([^(\[]+)/))) add(m[1], 'chat');
+      else if ((m = e.d.match(/^Group DM \(([^)]+)\)/))) m[1].split(/,\s*/).forEach(n => add(n, 'chat'));
+      else if ((m = e.d.match(/^(#[\w-]+)/))) add(m[1], 'chat');
+    }
+  });
+  const rows = Object.entries(P).map(([n, v]) => ({ n, ...v, t: v.chat + v.email })).sort((a, b) => b.t - a.t).slice(0, 14);
+  const items = [{ label: 'Chat', color: 'var(--s1)' }, { label: 'Email', color: 'var(--s2)' }];
+  legend(document.getElementById('peopleLegend'), items);
+  const W = width('people'), L = 230, R = 40, row = 24, H = rows.length * row + 22;
+  const maxV = axis(Math.max(1, ...rows.map(r => r.t))).max;
+  const x = v => L + (W - L - R) * v / maxV;
+  let g = '';
+  rows.forEach((r, i) => {
+    const y = i * row; const label = CONTACTS[r.n] || r.n;
+    const tag = CONTACTS[r.n] && !r.chat ? ' · email only' : '';
+    g += `<text x="${L - 8}" y="${y + 15}" text-anchor="end">${esc(label + tag)}</text>`;
+    if (r.chat) g += rect(L, y + 4, x(r.chat) - L - 2, row - 8, items[0].color, `${label}: ${r.chat} chat message${r.chat === 1 ? '' : 's'}`);
+    if (r.email) g += rect(x(r.chat), y + 4, x(r.email) - L - 2, row - 8, items[1].color, `${label}: ${r.email} email${r.email === 1 ? '' : 's'}`);
+    g += `<text class="val" x="${x(r.t) + 4}" y="${y + 15}">${r.t}</text>`;
+  });
+  g += `<text x="${L}" y="${H - 4}">${rows.length ? '' : 'No chat or email signals'}</text>`;
+  document.getElementById('people').innerHTML = svg(W, H, g);
+}
+
+// ---------- sources ----------
+function sources() {
+  const srcs = [...new Set(events.map(e => e.src))].sort((a, b) => events.filter(e => e.src === b).length - events.filter(e => e.src === a).length);
+  const items = srcs.map((s, i) => ({ label: s, color: SRC_COLORS[i % SRC_COLORS.length] }));
+  legend(document.getElementById('srcLegend'), items);
+  const W = width('sources'), L = 34, B = 34, T = 10, H = 220;
+  const per = dates.map(d => { const o = { d, total: 0 }; srcs.forEach(s => { o[s] = events.filter(e => e.s.startsWith(d) && e.src === s).length; o.total += o[s]; }); return o; });
+  const ax = axis(Math.max(1, ...per.map(p => p.total))), maxV = ax.max;
+  const y = v => T + (H - T - B) * (1 - v / maxV);
+  const slot = (W - L) / Math.max(1, per.length), bw = Math.min(42, slot * 0.62);
+  let g = '';
+  for (let t = 0; t <= maxV + 1e-9; t += ax.step) g += `<line x1="${L}" x2="${W}" y1="${y(t)}" y2="${y(t)}" style="stroke:var(--grid)"/><text x="${L - 6}" y="${y(t) + 4}" text-anchor="end">${tickLabel(t)}</text>`;
+  per.forEach((p, i) => {
+    const cx = L + slot * i + (slot - bw) / 2; let acc = 0;
+    items.forEach(it => { const n = p[it.label]; if (!n) return; const y0 = y(acc + n), y1 = y(acc); g += rect(cx, y0, bw, Math.max(0, y1 - y0 - 2), it.color, `${fmtD(p.d)}\n${it.label}: ${n}`); acc += n; });
+    const dd = parseD(p.d);
+    g += `<text x="${cx + bw / 2}" y="${H - 18}" text-anchor="middle">${dd.toLocaleDateString(undefined, { weekday: 'short' })}</text><text x="${cx + bw / 2}" y="${H - 5}" text-anchor="middle">${dd.getMonth() + 1}/${dd.getDate()}</text>`;
+  });
+  document.getElementById('sources').innerHTML = svg(W, H, g);
+}
+
+// ---------- timesheet ----------
+function timesheet() {
+  const rows = dates.map(d => {
+    const bs = blocks.filter(b => b.Date === d);
+    const mins = sum(bs, 'BillableMin'); if (!mins) return null;
+    const hrs = Math.ceil(mins / 15) / 4;
+    const ids = new Set(bs.map(b => b.i));
+    const evs = events.filter(e => ids.has(e.b));
+    const isBill = e => !(PERSONAL && PERSONAL.test(e.d)) && !(ADMIN && ADMIN.test(e.d)) && !(NEUTRAL && NEUTRAL.test(e.d));
+    const mtgs = [...new Set(evs.filter(e => /^Meeting/.test(e.src) && isBill(e)).map(e => e.d.replace(/^Meeting:\s*/, '')))];
+    const text = evs.filter(e => !/^Meeting/.test(e.src) && isBill(e)).map(e => e.d).join(' \n ');
+    const themes = THEMES.filter(t => t.re.test(text)).map(t => t.label);
+    const parts = [];
+    if (mtgs.length) parts.push(mtgs.join('; '));
+    if (themes.length) { const t = themes.join(', '); parts.push(t.charAt(0).toUpperCase() + t.slice(1)); }
+    return { d, hrs, desc: parts.join('. ') + (parts.length ? '.' : 'Engagement work.') };
+  }).filter(Boolean);
+  const total = sum(rows, 'hrs');
+  document.getElementById('timesheet').innerHTML =
+    `<thead><tr><th>Date</th><th class="num">Hours</th><th>Description</th><th></th></tr></thead><tbody>` +
+    rows.map((r, i) => `<tr><td style="white-space:nowrap">${esc(fmtD(r.d))}</td><td class="num">${r.hrs.toFixed(2)}</td><td>${esc(r.desc)}</td><td><button type="button" data-copy="${i}">Copy</button></td></tr>`).join('') +
+    `</tbody><tfoot><tr><th>Total</th><th class="num">${total.toFixed(2)}</th><th colspan="2"></th></tr></tfoot>`;
+  document.querySelectorAll('[data-copy]').forEach(btn => btn.onclick = () => {
+    const r = rows[btn.dataset.copy];
+    const txt = `${r.d}\t${r.hrs.toFixed(2)}\t${r.desc}`;
+    (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(
+      () => { btn.textContent = 'Copied'; setTimeout(() => btn.textContent = 'Copy', 1200); },
+      () => { btn.textContent = 'Select text'; });
+  });
+}
+
+// ---------- blocks table ----------
+let filter = 'All';
+function blocksTable() {
+  const keys = ['All', ...CATS.filter(c => blocks.some(b => majority(b.Category) === c.key)).map(c => c.key)];
+  document.getElementById('chips').innerHTML = keys.map(k => `<button type="button" class="chip" aria-pressed="${k === filter}" data-f="${k}">${esc(k)}</button>`).join('');
+  document.querySelectorAll('.chip').forEach(c => c.onclick = () => { filter = c.dataset.f; blocksTable(); });
+  const shown = blocks.filter(b => filter === 'All' || majority(b.Category) === filter);
+  let html = `<thead><tr><th>Date</th><th>Time</th><th class="num">Min</th><th>Category</th><th class="num">Billable</th><th class="num">Signals</th><th>Meetings / activity</th></tr></thead><tbody>`;
+  shown.forEach(b => {
+    const c = CATS.find(c => c.key === majority(b.Category)) || CATS[3];
+    const odd = toMin(b.Start) < 6 * 60 || toMin(b.Start) >= 22 * 60;
+    html += `<tr class="blk" data-b="${b.i}"><td style="white-space:nowrap">${esc(fmtD(b.Date))}</td><td style="white-space:nowrap">${esc(b.Start)}–${esc(b.End)}${odd ? '<span class="flag" title="Odd hour: could be a browser session restore. Check before billing.">check</span>' : ''}</td>` +
+      `<td class="num">${b.Minutes}</td><td style="white-space:nowrap"><span class="dot" style="background:${c.color}"></span>${esc(b.Category)}</td><td class="num">${b.BillableMin}</td><td class="num">${b.Signals}</td><td>${esc([b.Meetings, b.Activity].filter(Boolean).join(' · '))}</td></tr>`;
+  });
+  document.getElementById('blocks').innerHTML = html + '</tbody>';
+  document.querySelectorAll('tr.blk').forEach(tr => tr.onclick = () => {
+    const nx = tr.nextElementSibling;
+    if (nx && nx.classList.contains('detail')) { nx.remove(); return; }
+    const evs = events.filter(e => e.b === Number(tr.dataset.b));
+    const d = document.createElement('tr'); d.className = 'detail';
+    d.innerHTML = `<td colspan="7"><ul>${evs.map(e => `<li>${esc(e.s.slice(11))}${e.e && e.e !== e.s ? '–' + esc(e.e.slice(11)) : ''} · ${esc(e.src)} · ${esc(e.d)}</li>`).join('')}</ul></td>`;
+    tr.after(d);
+  });
+}
+
+// ---------- method ----------
+function method() {
+  const srcs = [...new Set(events.map(e => e.src))].join(', ');
+  const items = [
+    `Sources: ${srcs || 'none'}. Only the user's own activity was collected, read-only.`,
+    `Signals within ${CFG.gapMinutes || 30} minutes of each other on the same day are merged into one block; each block counts at least ${CFG.minBlockMinutes || 5} minutes.`,
+    `Each signal votes for a category; meetings count ${CFG.meetingWeight || 10} votes. Block minutes are split in proportion to votes. General tools (mail, calendar, docs, chat) don't vote.`,
+    `Blocks with no votes are "Unclear" and are never billed automatically. Blocks at odd hours are marked "check".`,
+    `All figures are lower bounds: thinking, reading and drafting that leave no digital trace are not counted.`,
+    `This report contains private detail. Share a stripped-down variant instead of this file.`,
+  ];
+  document.getElementById('method').innerHTML = items.map(t => `<li>${esc(t)}</li>`).join('');
+}
+
+// ---------- tooltip, theme, render ----------
+const tip = document.getElementById('tip');
+document.addEventListener('mousemove', e => {
+  const t = e.target.closest && e.target.closest('[data-tip]');
+  if (!t) { tip.style.display = 'none'; return; }
+  tip.textContent = t.getAttribute('data-tip'); tip.style.display = 'block';
+  const r = tip.getBoundingClientRect();
+  tip.style.left = Math.min(window.innerWidth - r.width - 8, e.clientX + 12) + 'px';
+  tip.style.top = (e.clientY + 14 + r.height > window.innerHeight ? e.clientY - r.height - 10 : e.clientY + 14) + 'px';
+});
+document.getElementById('theme').onclick = () => {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  root.dataset.theme = dark ? 'light' : 'dark';
+};
+function renderCharts() { weekly(); daily(); gantt(); heat(); people(); sources(); }
+tiles(); renderCharts(); timesheet(); blocksTable(); method();
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(renderCharts, 150); });
+</script>
+</body>
+</html>

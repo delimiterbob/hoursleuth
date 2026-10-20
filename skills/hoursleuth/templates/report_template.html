@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hoursleuth Activity Report</title>
+<style>
+:root {
+  --bg: #f7f7f5; --card: #ffffff; --ink: #1d1d1b; --muted: #6b6b66; --line: #e4e3de; --grid: #eeede9;
+  --c-billable: #2f6fde; --c-admin: #d98a1c; --c-personal: #9b59b6; --c-unclear: #a3a39d;
+  --s1: #2f6fde; --s2: #18a37a; --s3: #d98a1c; --s4: #e0b341; --s5: #9b59b6; --s6: #d1495b; --s7: #6b8794;
+  --heat0: #eef2fb; --heat1: #c7d6f5; --heat2: #8eaeea; --heat3: #4f80de; --heat4: #1f4fb0;
+  --tip-bg: #1d1d1b; --tip-ink: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141413; --card: #1f1f1d; --ink: #ececea; --muted: #a2a29c; --line: #34342f; --grid: #2a2a27;
+    --c-billable: #6b9bf0; --c-admin: #e9a443; --c-personal: #b98ad0; --c-unclear: #77776f;
+    --s1: #6b9bf0; --s2: #3cc497; --s3: #e9a443; --s4: #ecc75f; --s5: #b98ad0; --s6: #e5707f; --s7: #8fa9b5;
+    --heat0: #23262d; --heat1: #263b63; --heat2: #2f5296; --heat3: #4a78cf; --heat4: #8db0f2;
+    --tip-bg: #ececea; --tip-ink: #141413;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141413; --card: #1f1f1d; --ink: #ececea; --muted: #a2a29c; --line: #34342f; --grid: #2a2a27;
+  --c-billable: #6b9bf0; --c-admin: #e9a443; --c-personal: #b98ad0; --c-unclear: #77776f;
+  --s1: #6b9bf0; --s2: #3cc497; --s3: #e9a443; --s4: #ecc75f; --s5: #b98ad0; --s6: #e5707f; --s7: #8fa9b5;
+  --heat0: #23262d; --heat1: #263b63; --heat2: #2f5296; --heat3: #4a78cf; --heat4: #8db0f2;
+  --tip-bg: #ececea; --tip-ink: #141413;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 1120px; margin: 0 auto; padding: 24px 16px 64px; }
+header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+h1 { font-size: 26px; margin: 0 0 4px; letter-spacing: -0.01em; }
+h2 { font-size: 16px; margin: 0 0 2px; }
+.sub { color: var(--muted); margin: 0; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 18px 18px 14px; margin-bottom: 16px; break-inside: avoid; }
+.card > .sub { margin-bottom: 12px; font-size: 13px; }
+button { font: inherit; color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+button:hover { border-color: var(--muted); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.tile { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.tile .v { font-size: 26px; font-weight: 650; letter-spacing: -0.02em; }
+.tile .l { color: var(--muted); font-size: 12px; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--muted); margin: 4px 0 8px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+svg { display: block; width: 100%; overflow: visible; }
+svg text { fill: var(--muted); font-size: 11px; }
+svg .val { fill: var(--ink); font-size: 11px; font-weight: 600; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--card); border-color: var(--ink); }
+.tablewrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--muted); font-weight: 600; font-size: 12px; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr.blk { cursor: pointer; }
+tr.blk:hover td { background: var(--grid); }
+tr.detail td { background: var(--bg); font-size: 12px; color: var(--muted); }
+tr.detail ul { margin: 0; padding-left: 18px; }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+.flag { font-size: 11px; color: var(--c-admin); border: 1px solid var(--c-admin); border-radius: 4px; padding: 0 4px; margin-left: 6px; white-space: nowrap; }
+#tip { position: fixed; pointer-events: none; background: var(--tip-bg); color: var(--tip-ink); font-size: 12px; padding: 7px 9px; border-radius: 6px; max-width: 320px; z-index: 10; display: none; white-space: pre-line; }
+.note { font-size: 13px; color: var(--muted); }
+.note li { margin-bottom: 4px; }
+@media print {
+  body { background: #fff; }
+  button, .chips, #tip { display: none !important; }
+  .card, .tile { border-color: #ccc; }
+  tr.detail { display: none; }
+}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>Activity report</h1>
+      <p class="sub" id="range"></p>
+    </div>
+    <button id="theme" type="button" aria-label="Toggle light or dark theme">Theme</button>
+  </header>
+
+  <div class="tiles" id="tiles"></div>
+
+  <section class="card"><h2>Weekly hours vs. allocation</h2><p class="sub" id="weeklySub"></p><div class="legend" data-legend="cats"></div><div id="weekly"></div></section>
+  <section class="card"><h2>Hours per day</h2><p class="sub">Each block's minutes are split across categories in proportion to its signals.</p><div class="legend" data-legend="cats"></div><div id="daily"></div></section>
+  <section class="card"><h2>Daily timeline</h2><p class="sub">Each bar is one block of continuous activity, colored by its majority category. Hover for detail.</p><div class="legend" data-legend="cats"></div><div id="gantt"></div></section>
+  <section class="card"><h2>When you work</h2><p class="sub">Signals per hour of the day. Darker means more activity.</p><div id="heat"></div></section>
+  <section class="card"><h2>Who you worked with</h2><p class="sub">Chat counterparts and email recipients. Client contacts are labeled.</p><div class="legend" id="peopleLegend"></div><div id="people"></div></section>
+  <section class="card"><h2>Where the signals came from</h2><p class="sub">Signals per day by source.</p><div class="legend" id="srcLegend"></div><div id="sources"></div></section>
+
+  <section class="card">
+    <h2>Draft timesheet</h2>
+    <p class="sub">Billable hours per day, rounded up to the quarter hour, with a description drafted from that day's billable meetings and themes. Review before entering.</p>
+    <div class="tablewrap"><table id="timesheet"></table></div>
+  </section>
+
+  <section class="card">
+    <h2>All activity blocks</h2>
+    <p class="sub">Click a row to see every signal behind it.</p>
+    <div class="chips" id="chips"></div>
+    <div class="tablewrap"><table id="blocks"></table></div>
+  </section>
+
+  <section class="card note">
+    <h2 style="color:var(--ink)">How this was built</h2>
+    <ul id="method"></ul>
+  </section>
+</main>
+<div id="tip" role="tooltip"></div>
+
+<script>
+const DATA = /*DATA*/;
+
+// ---------- config ----------
+const CFG = DATA.config || {};
+const CATS = [
+  { key: 'Billable', label: CFG.billableLabel ? 'Billable (' + CFG.billableLabel + ')' : 'Billable', color: 'var(--c-billable)', field: 'BillableMin' },
+  { key: 'Admin',    label: 'Admin',    color: 'var(--c-admin)',    field: 'AdminMin' },
+  { key: 'Personal', label: 'Personal', color: 'var(--c-personal)', field: 'PersonalMin' },
+  { key: 'Unclear',  label: 'Unclear',  color: 'var(--c-unclear)',  field: 'UnclearMin' },
+];
+const SRC_COLORS = ['var(--s1)','var(--s2)','var(--s3)','var(--s4)','var(--s5)','var(--s6)','var(--s7)'];
+const rx = p => { try { return p ? new RegExp(p, 'i') : null; } catch (e) { return null; } };
+const ADMIN = rx(CFG.adminPattern), PERSONAL = rx(CFG.personalPattern), NEUTRAL = rx(CFG.neutralPattern);
+const CONTACTS = CFG.clientContacts || {};
+const THEMES = (CFG.timesheetThemes || []).map(t => ({ label: t.label, re: rx(t.pattern) })).filter(t => t.re);
+const ALLOC = Number(CFG.weeklyAllocationHours) || 0;
+
+// ---------- helpers ----------
+const blocks = (DATA.blocks || []).map((b, i) => ({ ...b, i }));
+const events = DATA.events || [];
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const h = m => (m / 60).toFixed(1);
+const toMin = hhmm => { const [a, b] = hhmm.split(':').map(Number); return a * 60 + b; };
+const parseD = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const fmtD = s => parseD(s).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+const majority = cat => (cat || 'Unclear').split(' ')[0];
+const catOf = d => (PERSONAL && PERSONAL.test(d)) ? 'Personal' : (ADMIN && ADMIN.test(d)) ? 'Admin' : 'Billable';
+const dates = [...new Set(blocks.map(b => b.Date))].sort();
+const sum = (arr, f) => arr.reduce((a, x) => a + (Number(typeof f === 'function' ? f(x) : x[f]) || 0), 0);
+const width = id => Math.max(320, document.getElementById(id).clientWidth);
+const usedCats = CATS.filter(c => sum(blocks, c.field) > 0);
+const svg = (w, hgt, body) => `<svg viewBox="0 0 ${w} ${hgt}" width="${w}" height="${hgt}" role="img">${body}</svg>`;
+const rect = (x, y, w, hh, color, tip, extra = '') =>
+  `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${Math.max(0, w).toFixed(1)}" height="${Math.max(0, hh).toFixed(1)}" rx="2" style="fill:${color}" data-tip="${esc(tip)}" ${extra}/>`;
+const niceStep = v => { if (v <= 0) return 1; const p = Math.pow(10, Math.floor(Math.log10(v))); for (const m of [1, 2, 2.5, 5, 10]) if (m * p >= v) return m * p; return 10 * p; };
+// Axis with ~4 round-number ticks: { max, step }
+const axis = v => { const step = niceStep(Math.max(v, 0.01) / 4); return { max: Math.ceil(Math.max(v, 0.01) / step) * step, step }; };
+const tickLabel = t => String(+t.toFixed(2));
+
+function legend(el, items) {
+  el.innerHTML = items.map(it => `<span><i style="background:${it.color}"></i>${esc(it.label)}</span>`).join('');
+}
+document.querySelectorAll('[data-legend="cats"]').forEach(el => legend(el, usedCats));
+
+// ---------- tiles ----------
+function tiles() {
+  const total = sum(blocks, 'Minutes'), bill = sum(blocks, 'BillableMin');
+  const byDay = {}; blocks.forEach(b => byDay[b.Date] = (byDay[b.Date] || 0) + b.Minutes);
+  const busiest = Object.entries(byDay).sort((a, b) => b[1] - a[1])[0];
+  const meetings = events.filter(e => /^Meeting/.test(e.src)).length;
+  const longest = blocks.reduce((a, b) => (b.Minutes > (a ? a.Minutes : -1) ? b : a), null);
+  const t = [
+    [h(total) + ' h', 'Total active time'],
+    [h(bill) + ' h', 'Billable · ' + (total ? Math.round(100 * bill / total) : 0) + '% of active'],
+    [busiest ? h(busiest[1]) + ' h' : '–', 'Busiest day' + (busiest ? ' · ' + fmtD(busiest[0]) : '')],
+    [meetings, 'Meetings'],
+    [events.length, 'Signals'],
+    [longest ? h(longest.Minutes) + ' h' : '–', 'Longest block' + (longest ? ' · ' + fmtD(longest.Date) : '')],
+  ];
+  document.getElementById('tiles').innerHTML = t.map(([v, l]) => `<div class="tile"><div class="v">${esc(v)}</div><div class="l">${esc(l)}</div></div>`).join('');
+  document.getElementById('range').textContent = dates.length
+    ? `${fmtD(dates[0])} – ${fmtD(dates[dates.length - 1])} · generated ${DATA.generated || ''} · all figures are lower bounds`
+    : 'No data';
+}
+
+// ---------- weekly ----------
+function weekly() {
+  const weeks = {};
+  blocks.forEach(b => {
+    const d = parseD(b.Date); const mon = new Date(d); mon.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+    const k = mon.toISOString().slice(0, 10);
+    (weeks[k] = weeks[k] || { k, mon, days: new Set(), mins: {} }).days.add(b.Date);
+    usedCats.forEach(c => weeks[k].mins[c.key] = (weeks[k].mins[c.key] || 0) + (b[c.field] || 0));
+  });
+  const ws = Object.values(weeks).sort((a, b) => a.mon - b.mon);
+  const lastDate = parseD(dates[dates.length - 1] || '2000-01-01');
+  const W = width('weekly'), L = 130, R = 50, row = 30, top = 6, H = top + ws.length * row + 22;
+  const ax = axis(Math.max(ALLOC, ...ws.map(w => sum(Object.values(w.mins), x => x) / 60))), maxH = ax.max;
+  const x = v => L + (W - L - R) * v / maxH;
+  let g = '';
+  for (let t = 0; t <= maxH + 1e-9; t += ax.step) g += `<line x1="${x(t)}" x2="${x(t)}" y1="${top}" y2="${H - 20}" style="stroke:var(--grid)"/><text x="${x(t)}" y="${H - 6}" text-anchor="middle">${tickLabel(t)}h</text>`;
+  ws.forEach((w, i) => {
+    const y = top + i * row + 4; let cx = L;
+    const end = new Date(w.mon); end.setDate(end.getDate() + 6);
+    const partial = end > lastDate;
+    g += `<text x="${L - 8}" y="${y + 15}" text-anchor="end">Week of ${w.mon.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}${partial ? ' (partial)' : ''}</text>`;
+    usedCats.forEach(c => {
+      const m = w.mins[c.key] || 0; if (!m) return;
+      const bw = x(m / 60) - L;
+      g += rect(cx, y, Math.max(0, bw - 2), row - 10, c.color, `${c.label}: ${h(m)} h`); cx += bw;
+    });
+    g += `<text class="val" x="${cx + 4}" y="${y + 15}">${h(sum(Object.values(w.mins), v => v))}h</text>`;
+  });
+  if (ALLOC) g += `<line x1="${x(ALLOC)}" x2="${x(ALLOC)}" y1="${top - 4}" y2="${H - 20}" style="stroke:var(--ink)" stroke-dasharray="4 3"/>`;
+  document.getElementById('weekly').innerHTML = svg(W, H, g);
+  document.getElementById('weeklySub').textContent = ALLOC
+    ? `Monday–Sunday weeks. The dashed line is the ${ALLOC}-hour weekly allocation.`
+    : 'Monday–Sunday weeks.';
+}
+
+// ---------- daily stacked columns ----------
+function daily() {
+  const W = width('daily'), L = 40, B = 34, T = 16, H = 240;
+  const per = dates.map(d => { const bs = blocks.filter(b => b.Date === d); const o = { d }; usedCats.forEach(c => o[c.key] = sum(bs, c.field)); o.total = sum(bs, 'Minutes'); return o; });
+  const ax = axis(Math.max(1, ...per.map(p => p.total / 60))), maxH = ax.max;
+  const y = v => T + (H - T - B) * (1 - v / maxH);
+  const slot = (W - L) / Math.max(1, per.length), bw = Math.min(42, slot * 0.62);
+  let g = '';
+  for (let t = 0; t <= maxH + 1e-9; t += ax.step) g += `<line x1="${L}" x2="${W}" y1="${y(t)}" y2="${y(t)}" style="stroke:var(--grid)"/><text x="${L - 6}" y="${y(t) + 4}" text-anchor="end">${tickLabel(t)}h</text>`;
+  per.forEach((p, i) => {
+    const cx = L + slot * i + (slot - bw) / 2; let acc = 0;
+    usedCats.forEach(c => {
+      const m = p[c.key]; if (!m) return;
+      const y0 = y((acc + m) / 60), y1 = y(acc / 60);
+      g += rect(cx, y0, bw, Math.max(0, y1 - y0 - 2), c.color, `${fmtD(p.d)}\n${c.label}: ${h(m)} h`); acc += m;
+    });
+    g += `<text class="val" x="${cx + bw / 2}" y="${y(p.total / 60) - 5}" text-anchor="middle">${h(p.total)}</text>`;
+    const dd = parseD(p.d);
+    g += `<text x="${cx + bw / 2}" y="${H - 18}" text-anchor="middle">${dd.toLocaleDateString(undefined, { weekday: 'short' })}</text><text x="${cx + bw / 2}" y="${H - 5}" text-anchor="middle">${dd.getMonth() + 1}/${dd.getDate()}</text>`;
+  });
+  document.getElementById('daily').innerHTML = svg(W, H, g);
+}
+
+// ---------- gantt ----------
+function gantt() {
+  const W = width('gantt'), L = 96, R = 10, row = 24, T = 4;
+  const startH = Math.min(8, ...blocks.map(b => Math.floor(toMin(b.Start) / 60)));
+  const endH = Math.max(18, ...blocks.map(b => Math.ceil((toMin(b.Start) + b.Minutes) / 60)));
+  const H = T + dates.length * row + 22;
+  const x = m => L + (W - L - R) * (m - startH * 60) / ((endH - startH) * 60);
+  let g = '';
+  for (let hr = startH; hr <= endH; hr++) {
+    g += `<line x1="${x(hr * 60)}" x2="${x(hr * 60)}" y1="${T}" y2="${H - 20}" style="stroke:var(--grid)"/>`;
+    if ((endH - startH) <= 14 || hr % 2 === 0) g += `<text x="${x(hr * 60)}" y="${H - 6}" text-anchor="middle">${((hr + 11) % 12) + 1}${hr < 12 || hr === 24 ? 'a' : 'p'}</text>`;
+  }
+  dates.forEach((d, i) => {
+    const y = T + i * row;
+    g += `<text x="${L - 8}" y="${y + 15}" text-anchor="end">${esc(fmtD(d))}</text>`;
+    blocks.filter(b => b.Date === d).forEach(b => {
+      const c = CATS.find(c => c.key === majority(b.Category)) || CATS[3];
+      const s = toMin(b.Start);
+      const tip = `${b.Start}–${b.End} · ${h(b.Minutes)} h · ${b.Category}` + (b.Meetings ? `\nMeetings: ${b.Meetings}` : '') + (b.Activity ? `\nActivity: ${b.Activity}` : '');
+      g += rect(x(s), y + 4, Math.max(3, x(s + b.Minutes) - x(s)), row - 8, c.color, tip);
+    });
+  });
+  document.getElementById('gantt').innerHTML = svg(W, H, g);
+}
+
+// ---------- heatmap ----------
+function heat() {
+  const counts = {}; let max = 0;
+  events.forEach(e => { const k = e.s.slice(0, 10) + '|' + Number(e.s.slice(11, 13)); counts[k] = (counts[k] || 0) + 1; max = Math.max(max, counts[k]); });
+  const hours = events.map(e => Number(e.s.slice(11, 13)));
+  const h0 = Math.min(7, ...hours), h1 = Math.max(19, ...hours);
+  const W = width('heat'), L = 96, T = 4, cell = Math.min(34, (W - L) / (h1 - h0 + 1)), row = 20, H = T + dates.length * row + 20;
+  const ramp = ['var(--heat0)', 'var(--heat1)', 'var(--heat2)', 'var(--heat3)', 'var(--heat4)'];
+  let g = '';
+  dates.forEach((d, i) => {
+    const y = T + i * row;
+    g += `<text x="${L - 8}" y="${y + 14}" text-anchor="end">${esc(fmtD(d))}</text>`;
+    for (let hr = h0; hr <= h1; hr++) {
+      const n = counts[d + '|' + hr] || 0;
+      const lvl = n === 0 ? 0 : Math.min(4, 1 + Math.floor(3 * n / Math.max(1, max)));
+      g += rect(L + (hr - h0) * cell + 1, y + 1, cell - 2, row - 2, ramp[lvl], `${fmtD(d)} ${hr}:00 – ${n} signal${n === 1 ? '' : 's'}`);
+    }
+  });
+  for (let hr = h0; hr <= h1; hr += 2) g += `<text x="${L + (hr - h0) * cell + cell / 2}" y="${H - 4}" text-anchor="middle">${((hr + 11) % 12) + 1}${hr < 12 ? 'a' : 'p'}</text>`;
+  document.getElementById('heat').innerHTML = svg(W, H, g);
+}
+
+// ---------- people ----------
+function people() {
+  const P = {};
+  const add = (name, kind) => { name = name.trim(); if (!name || /^me$/i.test(name)) return; (P[name] = P[name] || { chat: 0, email: 0 })[kind]++; };
+  events.forEach(e => {
+    if (e.src === 'Email') { const m = e.d.match(/\(([^()]+)\)\s*$/); if (m) m[1].split(/,\s*/).forEach(n => add(n, 'email')); }
+    else if (e.src === 'Slack' || e.src === 'Chat') {
+      let m;
+      if ((m = e.d.match(/^DM ([^(\[]+)/))) add(m[1], 'chat');
+      else if ((m = e.d.match(/^Group DM \(([^)]+)\)/))) m[1].split(/,\s*/).forEach(n => add(n, 'chat'));
+      else if ((m = e.d.match(/^(#[\w-]+)/))) add(m[1], 'chat');
+    }
+  });
+  const rows = Object.entries(P).map(([n, v]) => ({ n, ...v, t: v.chat + v.email })).sort((a, b) => b.t - a.t).slice(0, 14);
+  const items = [{ label: 'Chat', color: 'var(--s1)' }, { label: 'Email', color: 'var(--s2)' }];
+  legend(document.getElementById('peopleLegend'), items);
+  const W = width('people'), L = 230, R = 40, row = 24, H = rows.length * row + 22;
+  const maxV = axis(Math.max(1, ...rows.map(r => r.t))).max;
+  const x = v => L + (W - L - R) * v / maxV;
+  let g = '';
+  rows.forEach((r, i) => {
+    const y = i * row; const label = CONTACTS[r.n] || r.n;
+    const tag = CONTACTS[r.n] && !r.chat ? ' · email only' : '';
+    g += `<text x="${L - 8}" y="${y + 15}" text-anchor="end">${esc(label + tag)}</text>`;
+    if (r.chat) g += rect(L, y + 4, x(r.chat) - L - 2, row - 8, items[0].color, `${label}: ${r.chat} chat message${r.chat === 1 ? '' : 's'}`);
+    if (r.email) g += rect(x(r.chat), y + 4, x(r.email) - L - 2, row - 8, items[1].color, `${label}: ${r.email} email${r.email === 1 ? '' : 's'}`);
+    g += `<text class="val" x="${x(r.t) + 4}" y="${y + 15}">${r.t}</text>`;
+  });
+  g += `<text x="${L}" y="${H - 4}">${rows.length ? '' : 'No chat or email signals'}</text>`;
+  document.getElementById('people').innerHTML = svg(W, H, g);
+}
+
+// ---------- sources ----------
+function sources() {
+  const srcs = [...new Set(events.map(e => e.src))].sort((a, b) => events.filter(e => e.src === b).length - events.filter(e => e.src === a).length);
+  const items = srcs.map((s, i) => ({ label: s, color: SRC_COLORS[i % SRC_COLORS.length] }));
+  legend(document.getElementById('srcLegend'), items);
+  const W = width('sources'), L = 34, B = 34, T = 10, H = 220;
+  const per = dates.map(d => { const o = { d, total: 0 }; srcs.forEach(s => { o[s] = events.filter(e => e.s.startsWith(d) && e.src === s).length; o.total += o[s]; }); return o; });
+  const ax = axis(Math.max(1, ...per.map(p => p.total))), maxV = ax.max;
+  const y = v => T + (H - T - B) * (1 - v / maxV);
+  const slot = (W - L) / Math.max(1, per.length), bw = Math.min(42, slot * 0.62);
+  let g = '';
+  for (let t = 0; t <= maxV + 1e-9; t += ax.step) g += `<line x1="${L}" x2="${W}" y1="${y(t)}" y2="${y(t)}" style="stroke:var(--grid)"/><text x="${L - 6}" y="${y(t) + 4}" text-anchor="end">${tickLabel(t)}</text>`;
+  per.forEach((p, i) => {
+    const cx = L + slot * i + (slot - bw) / 2; let acc = 0;
+    items.forEach(it => { const n = p[it.label]; if (!n) return; const y0 = y(acc + n), y1 = y(acc); g += rect(cx, y0, bw, Math.max(0, y1 - y0 - 2), it.color, `${fmtD(p.d)}\n${it.label}: ${n}`); acc += n; });
+    const dd = parseD(p.d);
+    g += `<text x="${cx + bw / 2}" y="${H - 18}" text-anchor="middle">${dd.toLocaleDateString(undefined, { weekday: 'short' })}</text><text x="${cx + bw / 2}" y="${H - 5}" text-anchor="middle">${dd.getMonth() + 1}/${dd.getDate()}</text>`;
+  });
+  document.getElementById('sources').innerHTML = svg(W, H, g);
+}
+
+// ---------- timesheet ----------
+function timesheet() {
+  const rows = dates.map(d => {
+    const bs = blocks.filter(b => b.Date === d);
+    const mins = sum(bs, 'BillableMin'); if (!mins) return null;
+    const hrs = Math.ceil(mins / 15) / 4;
+    const ids = new Set(bs.map(b => b.i));
+    const evs = events.filter(e => ids.has(e.b));
+    const isBill = e => !(PERSONAL && PERSONAL.test(e.d)) && !(ADMIN && ADMIN.test(e.d)) && !(NEUTRAL && NEUTRAL.test(e.d));
+    const mtgs = [...new Set(evs.filter(e => /^Meeting/.test(e.src) && isBill(e)).map(e => e.d.replace(/^Meeting:\s*/, '')))];
+    const text = evs.filter(e => !/^Meeting/.test(e.src) && isBill(e)).map(e => e.d).join(' \n ');
+    const themes = THEMES.filter(t => t.re.test(text)).map(t => t.label);
+    const parts = [];
+    if (mtgs.length) parts.push(mtgs.join('; '));
+    if (themes.length) { const t = themes.join(', '); parts.push(t.charAt(0).toUpperCase() + t.slice(1)); }
+    return { d, hrs, desc: parts.join('. ') + (parts.length ? '.' : 'Engagement work.') };
+  }).filter(Boolean);
+  const total = sum(rows, 'hrs');
+  document.getElementById('timesheet').innerHTML =
+    `<thead><tr><th>Date</th><th class="num">Hours</th><th>Description</th><th></th></tr></thead><tbody>` +
+    rows.map((r, i) => `<tr><td style="white-space:nowrap">${esc(fmtD(r.d))}</td><td class="num">${r.hrs.toFixed(2)}</td><td>${esc(r.desc)}</td><td><button type="button" data-copy="${i}">Copy</button></td></tr>`).join('') +
+    `</tbody><tfoot><tr><th>Total</th><th class="num">${total.toFixed(2)}</th><th colspan="2"></th></tr></tfoot>`;
+  document.querySelectorAll('[data-copy]').forEach(btn => btn.onclick = () => {
+    const r = rows[btn.dataset.copy];
+    const txt = `${r.d}\t${r.hrs.toFixed(2)}\t${r.desc}`;
+    (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(
+      () => { btn.textContent = 'Copied'; setTimeout(() => btn.textContent = 'Copy', 1200); },
+      () => { btn.textContent = 'Select text'; });
+  });
+}
+
+// ---------- blocks table ----------
+let filter = 'All';
+function blocksTable() {
+  const keys = ['All', ...CATS.filter(c => blocks.some(b => majority(b.Category) === c.key)).map(c => c.key)];
+  document.getElementById('chips').innerHTML = keys.map(k => `<button type="button" class="chip" aria-pressed="${k === filter}" data-f="${k}">${esc(k)}</button>`).join('');
+  document.querySelectorAll('.chip').forEach(c => c.onclick = () => { filter = c.dataset.f; blocksTable(); });
+  const shown = blocks.filter(b => filter === 'All' || majority(b.Category) === filter);
+  let html = `<thead><tr><th>Date</th><th>Time</th><th class="num">Min</th><th>Category</th><th class="num">Billable</th><th class="num">Signals</th><th>Meetings / activity</th></tr></thead><tbody>`;
+  shown.forEach(b => {
+    const c = CATS.find(c => c.key === majority(b.Category)) || CATS[3];
+    const odd = toMin(b.Start) < 6 * 60 || toMin(b.Start) >= 22 * 60;
+    html += `<tr class="blk" data-b="${b.i}"><td style="white-space:nowrap">${esc(fmtD(b.Date))}</td><td style="white-space:nowrap">${esc(b.Start)}–${esc(b.End)}${odd ? '<span class="flag" title="Odd hour: could be a browser session restore. Check before billing.">check</span>' : ''}</td>` +
+      `<td class="num">${b.Minutes}</td><td style="white-space:nowrap"><span class="dot" style="background:${c.color}"></span>${esc(b.Category)}</td><td class="num">${b.BillableMin}</td><td class="num">${b.Signals}</td><td>${esc([b.Meetings, b.Activity].filter(Boolean).join(' · '))}</td></tr>`;
+  });
+  document.getElementById('blocks').innerHTML = html + '</tbody>';
+  document.querySelectorAll('tr.blk').forEach(tr => tr.onclick = () => {
+    const nx = tr.nextElementSibling;
+    if (nx && nx.classList.contains('detail')) { nx.remove(); return; }
+    const evs = events.filter(e => e.b === Number(tr.dataset.b));
+    const d = document.createElement('tr'); d.className = 'detail';
+    d.innerHTML = `<td colspan="7"><ul>${evs.map(e => `<li>${esc(e.s.slice(11))}${e.e && e.e !== e.s ? '–' + esc(e.e.slice(11)) : ''} · ${esc(e.src)} · ${esc(e.d)}</li>`).join('')}</ul></td>`;
+    tr.after(d);
+  });
+}
+
+// ---------- method ----------
+function method() {
+  const srcs = [...new Set(events.map(e => e.src))].join(', ');
+  const items = [
+    `Sources: ${srcs || 'none'}. Only the user's own activity was collected, read-only.`,
+    `Signals within ${CFG.gapMinutes || 30} minutes of each other on the same day are merged into one block; each block counts at least ${CFG.minBlockMinutes || 5} minutes.`,
+    `Each signal votes for a category; meetings count ${CFG.meetingWeight || 10} votes. Block minutes are split in proportion to votes. General tools (mail, calendar, docs, chat) don't vote.`,
+    `Blocks with no votes are "Unclear" and are never billed automatically. Blocks at odd hours are marked "check".`,
+    `All figures are lower bounds: thinking, reading and drafting that leave no digital trace are not counted.`,
+    `This report contains private detail. Share a stripped-down variant instead of this file.`,
+  ];
+  document.getElementById('method').innerHTML = items.map(t => `<li>${esc(t)}</li>`).join('');
+}
+
+// ---------- tooltip, theme, render ----------
+const tip = document.getElementById('tip');
+document.addEventListener('mousemove', e => {
+  const t = e.target.closest && e.target.closest('[data-tip]');
+  if (!t) { tip.style.display = 'none'; return; }
+  tip.textContent = t.getAttribute('data-tip'); tip.style.display = 'block';
+  const r = tip.getBoundingClientRect();
+  tip.style.left = Math.min(window.innerWidth - r.width - 8, e.clientX + 12) + 'px';
+  tip.style.top = (e.clientY + 14 + r.height > window.innerHeight ? e.clientY - r.height - 10 : e.clientY + 14) + 'px';
+});
+document.getElementById('theme').onclick = () => {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  root.dataset.theme = dark ? 'light' : 'dark';
+};
+function renderCharts() { weekly(); daily(); gantt(); heat(); people(); sources(); }
+tiles(); renderCharts(); timesheet(); blocksTable(); method();
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(renderCharts, 150); });
+</script>
+</body>
+</html>

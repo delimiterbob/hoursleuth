@@ -1,0 +1,243 @@
+Time,Browser,Host,Title
+2026-03-02 09:14:27,Chrome,client-a.example.com,Client A intranet
+2026-03-02 09:15:46,Chrome,claude.ai,Claude
+2026-03-02 09:18:33,Chrome,claude.ai,Claude
+2026-03-02 09:20:07,Chrome,app.slack.com,Slack
+2026-03-02 09:21:02,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-02 09:35:43,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-02 09:41:47,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-02 09:59:27,Chrome,docs.google.com,Untitled document - Google Docs
+2026-03-02 12:51:46,Chrome,calendar.google.com,Calendar - Week
+2026-03-02 13:07:20,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-02 13:54:26,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-02 14:00:44,Chrome,calendar.google.com,Calendar - Week
+2026-03-02 14:09:26,Chrome,calendar.google.com,Calendar - Week
+2026-03-02 14:10:35,Chrome,claude.ai,Claude
+2026-03-02 14:17:36,Chrome,calendar.google.com,Calendar - Week
+2026-03-02 14:19:47,Chrome,mail.google.com,Inbox
+2026-03-02 14:22:13,Chrome,app.slack.com,Slack
+2026-03-02 14:31:38,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-02 14:42:18,Chrome,client-a.example.com,Client A intranet
+2026-03-02 14:45:28,Chrome,app.slack.com,Slack
+2026-03-02 14:52:13,Chrome,client-a.example.com,Client A intranet
+2026-03-02 14:54:52,Chrome,claude.ai,Claude
+2026-03-02 14:59:43,Chrome,calendar.google.com,Calendar - Week
+2026-03-02 15:01:40,Chrome,client-a.example.com,Client A intranet
+2026-03-02 15:03:10,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-02 15:05:09,Chrome,docs.google.com,Untitled document - Google Docs
+2026-03-03 09:08:39,Chrome,claude.ai,Claude
+2026-03-03 09:19:35,Chrome,mail.google.com,Inbox
+2026-03-03 09:20:56,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-03 09:24:09,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-03 09:25:11,Chrome,claude.ai,Claude
+2026-03-03 09:25:12,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-03 09:29:24,Chrome,app.slack.com,Slack
+2026-03-03 09:39:00,Chrome,claude.ai,Claude
+2026-03-03 09:40:33,Chrome,app.slack.com,Slack
+2026-03-03 09:41:56,Chrome,docs.google.com,Untitled document - Google Docs
+2026-03-03 13:56:51,Chrome,app.slack.com,Slack
+2026-03-03 14:11:20,Chrome,claude.ai,Claude
+2026-03-03 14:13:33,Chrome,client-a.example.com,Client A intranet
+2026-03-03 14:23:27,Chrome,claude.ai,Claude
+2026-03-03 14:24:28,Chrome,mail.google.com,Inbox
+2026-03-03 14:24:53,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-03 14:25:49,Chrome,claude.ai,Claude
+2026-03-03 14:26:52,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-03 14:31:16,Chrome,claude.ai,Claude
+2026-03-03 14:32:15,Chrome,calendar.google.com,Calendar - Week
+2026-03-03 14:37:04,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-03 14:43:15,Chrome,calendar.google.com,Calendar - Week
+2026-03-03 14:46:08,Chrome,mail.google.com,Inbox
+2026-03-03 14:54:57,Chrome,client-a.example.com,Client A intranet
+2026-03-03 15:14:44,Chrome,mail.google.com,Inbox
+2026-03-03 15:15:26,Chrome,app.slack.com,Slack
+2026-03-03 15:19:13,Chrome,claude.ai,Claude
+2026-03-03 15:35:29,Chrome,app.slack.com,Slack
+2026-03-03 15:44:57,Chrome,claude.ai,Claude
+2026-03-03 15:50:44,Chrome,docs.google.com,Untitled document - Google Docs
+2026-03-03 15:56:36,Chrome,app.slack.com,Slack
+2026-03-04 08:47:22,Chrome,calendar.google.com,Calendar - Week
+2026-03-04 09:00:34,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-04 09:11:24,Chrome,claude.ai,Claude
+2026-03-04 09:17:14,Chrome,calendar.google.com,Calendar - Week
+2026-03-04 09:28:42,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-04 09:30:46,Chrome,mail.google.com,Inbox
+2026-03-04 09:33:01,Chrome,app.slack.com,Slack
+2026-03-04 09:37:58,Chrome,app.slack.com,Slack
+2026-03-04 09:41:39,Chrome,client-a.example.com,Client A intranet
+2026-03-04 09:55:36,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-04 10:25:55,Chrome,app.slack.com,Slack
+2026-03-04 10:26:03,Chrome,calendar.google.com,Calendar - Week
+2026-03-04 10:33:20,Chrome,mail.google.com,Inbox
+2026-03-04 13:35:21,Chrome,claude.ai,Claude
+2026-03-04 13:37:17,Chrome,claude.ai,Claude
+2026-03-04 13:38:16,Chrome,claude.ai,Claude
+2026-03-04 13:58:47,Chrome,client-a.example.com,Client A intranet
+2026-03-04 13:59:22,Chrome,mail.google.com,Inbox
+2026-03-04 14:18:04,Chrome,claude.ai,Claude
+2026-03-04 14:49:53,Chrome,docs.google.com,Untitled document - Google Docs
+2026-03-04 14:55:08,Chrome,app.slack.com,Slack
+2026-03-04 15:20:44,Chrome,calendar.google.com,Calendar - Week
+2026-03-04 15:31:38,Chrome,client-a.example.com,Client A intranet
+2026-03-04 15:49:45,Chrome,docs.google.com,Untitled document - Google Docs
+2026-03-05 08:49:06,Chrome,client-a.example.com,Client A intranet
+2026-03-05 08:58:45,Chrome,mail.google.com,Inbox
+2026-03-05 09:04:43,Chrome,app.slack.com,Slack
+2026-03-05 09:06:44,Chrome,claude.ai,Claude
+2026-03-05 09:11:50,Chrome,client-a.example.com,Client A intranet
+2026-03-05 09:29:38,Chrome,claude.ai,Claude
+2026-03-05 10:59:04,Chrome,client-a.example.com,Client A intranet
+2026-03-05 11:05:27,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-05 13:20:54,Chrome,app.slack.com,Slack
+2026-03-05 13:35:06,Chrome,app.slack.com,Slack
+2026-03-05 14:15:45,Chrome,mail.google.com,Inbox
+2026-03-05 14:18:46,Chrome,client-a.example.com,Client A intranet
+2026-03-05 14:21:57,Chrome,claude.ai,Claude
+2026-03-05 14:30:49,Chrome,app.slack.com,Slack
+2026-03-05 14:30:53,Chrome,docs.google.com,Untitled document - Google Docs
+2026-03-05 14:33:17,Chrome,client-a.example.com,Client A intranet
+2026-03-05 14:36:52,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-05 14:41:17,Chrome,calendar.google.com,Calendar - Week
+2026-03-05 14:47:15,Chrome,claude.ai,Claude
+2026-03-05 14:47:36,Chrome,client-a.example.com,Client A intranet
+2026-03-06 09:02:22,Chrome,claude.ai,Claude
+2026-03-06 09:06:01,Chrome,app.slack.com,Slack
+2026-03-06 09:06:11,Chrome,app.slack.com,Slack
+2026-03-06 09:11:17,Chrome,client-a.example.com,Client A intranet
+2026-03-06 09:18:15,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-06 09:23:56,Chrome,calendar.google.com,Calendar - Week
+2026-03-06 09:25:44,Chrome,app.slack.com,Slack
+2026-03-06 09:33:35,Chrome,claude.ai,Claude
+2026-03-06 09:35:05,Chrome,calendar.google.com,Calendar - Week
+2026-03-06 09:38:45,Chrome,app.slack.com,Slack
+2026-03-06 09:42:19,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-06 09:42:25,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-06 14:17:27,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-06 14:21:35,Chrome,client-a.example.com,Client A intranet
+2026-03-06 14:35:19,Chrome,calendar.google.com,Calendar - Week
+2026-03-06 14:38:44,Chrome,app.slack.com,Slack
+2026-03-06 14:52:46,Chrome,mail.google.com,Inbox
+2026-03-06 15:09:47,Chrome,client-a.example.com,Client A intranet
+2026-03-06 15:30:44,Chrome,mail.google.com,Inbox
+2026-03-06 15:54:47,Chrome,app.slack.com,Slack
+2026-03-06 17:24:38,Chrome,calendar.google.com,Calendar - Week
+2026-03-06 17:31:37,Chrome,claude.ai,Claude
+2026-03-09 09:12:14,Chrome,calendar.google.com,Calendar - Week
+2026-03-09 09:18:00,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-09 09:26:02,Chrome,docs.google.com,Untitled document - Google Docs
+2026-03-09 09:55:08,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-09 09:57:31,Chrome,docs.google.com,Untitled document - Google Docs
+2026-03-09 14:19:25,Chrome,app.slack.com,Slack
+2026-03-09 14:23:11,Chrome,docs.google.com,Untitled document - Google Docs
+2026-03-09 14:28:30,Chrome,app.slack.com,Slack
+2026-03-09 14:32:07,Chrome,claude.ai,Claude
+2026-03-09 14:56:51,Chrome,client-a.example.com,Client A intranet
+2026-03-09 15:10:15,Chrome,docs.google.com,Untitled document - Google Docs
+2026-03-09 15:25:48,Chrome,app.slack.com,Slack
+2026-03-09 15:43:19,Chrome,claude.ai,Claude
+2026-03-09 15:45:33,Chrome,app.slack.com,Slack
+2026-03-09 15:47:27,Chrome,calendar.google.com,Calendar - Week
+2026-03-09 15:47:39,Chrome,docs.google.com,Untitled document - Google Docs
+2026-03-10 04:02:10,Chrome,docs.google.com,Untitled document - Google Docs
+2026-03-10 04:02:11,Chrome,mail.google.com,Inbox
+2026-03-10 04:02:12,Chrome,calendar.google.com,Calendar - Week
+2026-03-10 04:02:13,Chrome,app.slack.com,Slack
+2026-03-10 04:02:14,Chrome,client-a.example.com,Client A intranet
+2026-03-10 09:01:11,Chrome,client-a.example.com,Client A intranet
+2026-03-10 09:02:13,Chrome,calendar.google.com,Calendar - Week
+2026-03-10 09:18:26,Chrome,app.slack.com,Slack
+2026-03-10 10:57:02,Chrome,mail.google.com,Inbox
+2026-03-10 10:57:45,Chrome,calendar.google.com,Calendar - Week
+2026-03-10 11:10:55,Chrome,app.slack.com,Slack
+2026-03-10 12:31:50,Chrome,claude.ai,Claude
+2026-03-10 12:51:07,Chrome,client-a.example.com,Client A intranet
+2026-03-10 14:10:09,Chrome,calendar.google.com,Calendar - Week
+2026-03-10 14:14:03,Chrome,mail.google.com,Inbox
+2026-03-10 14:38:29,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-10 14:42:58,Chrome,calendar.google.com,Calendar - Week
+2026-03-10 14:43:32,Chrome,client-a.example.com,Client A intranet
+2026-03-10 14:43:47,Chrome,claude.ai,Claude
+2026-03-10 14:44:44,Chrome,app.slack.com,Slack
+2026-03-10 14:49:56,Chrome,app.slack.com,Slack
+2026-03-10 14:52:05,Chrome,mail.google.com,Inbox
+2026-03-10 15:02:05,Chrome,client-a.example.com,Client A intranet
+2026-03-10 15:11:20,Chrome,client-a.example.com,Client A intranet
+2026-03-10 15:13:53,Chrome,claude.ai,Claude
+2026-03-11 08:55:02,Chrome,claude.ai,Claude
+2026-03-11 08:57:11,Chrome,client-a.example.com,Client A intranet
+2026-03-11 09:01:11,Chrome,app.slack.com,Slack
+2026-03-11 09:02:40,Chrome,claude.ai,Claude
+2026-03-11 09:04:05,Chrome,app.slack.com,Slack
+2026-03-11 09:14:21,Chrome,calendar.google.com,Calendar - Week
+2026-03-11 09:22:06,Chrome,claude.ai,Claude
+2026-03-11 09:23:26,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-11 09:27:42,Chrome,app.slack.com,Slack
+2026-03-11 09:32:05,Chrome,calendar.google.com,Calendar - Week
+2026-03-11 09:42:35,Chrome,docs.google.com,Untitled document - Google Docs
+2026-03-11 13:35:07,Chrome,claude.ai,Claude
+2026-03-11 13:37:55,Chrome,client-a.example.com,Client A intranet
+2026-03-11 14:04:03,Chrome,mail.google.com,Inbox
+2026-03-11 14:07:23,Chrome,client-a.example.com,Client A intranet
+2026-03-11 14:15:31,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-11 14:56:35,Chrome,mail.google.com,Inbox
+2026-03-11 14:57:28,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-11 15:12:03,Chrome,mail.google.com,Inbox
+2026-03-12 08:50:01,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-12 09:06:51,Chrome,mail.google.com,Inbox
+2026-03-12 09:07:14,Chrome,claude.ai,Claude
+2026-03-12 09:08:29,Chrome,docs.google.com,Untitled document - Google Docs
+2026-03-12 09:09:10,Chrome,calendar.google.com,Calendar - Week
+2026-03-12 09:24:58,Chrome,client-a.example.com,Client A intranet
+2026-03-12 09:25:53,Chrome,mail.google.com,Inbox
+2026-03-12 09:28:30,Chrome,mail.google.com,Inbox
+2026-03-12 09:34:47,Chrome,mail.google.com,Inbox
+2026-03-12 09:35:09,Chrome,app.slack.com,Slack
+2026-03-12 09:35:17,Chrome,app.slack.com,Slack
+2026-03-12 09:35:18,Chrome,client-a.example.com,Client A intranet
+2026-03-12 14:02:21,Chrome,claude.ai,Claude
+2026-03-12 14:11:18,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-12 14:13:50,Chrome,claude.ai,Claude
+2026-03-12 14:20:53,Chrome,client-a.example.com,Client A intranet
+2026-03-12 14:23:28,Chrome,client-a.example.com,Client A intranet
+2026-03-12 14:34:22,Chrome,calendar.google.com,Calendar - Week
+2026-03-12 14:36:48,Chrome,client-a.example.com,Client A intranet
+2026-03-13 08:44:44,Chrome,mail.google.com,Inbox
+2026-03-13 08:52:59,Chrome,calendar.google.com,Calendar - Week
+2026-03-13 08:53:20,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-13 08:56:24,Chrome,mail.google.com,Inbox
+2026-03-13 09:04:24,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-13 09:07:45,Chrome,claude.ai,Claude
+2026-03-13 09:18:46,Chrome,mail.google.com,Inbox
+2026-03-13 09:18:55,Chrome,claude.ai,Claude
+2026-03-13 09:22:04,Chrome,app.slack.com,Slack
+2026-03-13 09:23:02,Chrome,mail.google.com,Inbox
+2026-03-13 09:29:06,Chrome,client-a.example.com,Client A intranet
+2026-03-13 09:31:55,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-13 14:10:39,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-13 14:12:41,Chrome,docs.google.com,Untitled document - Google Docs
+2026-03-13 14:29:20,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-13 14:30:15,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-13 14:38:54,Chrome,client-a.example.com,Client A intranet
+2026-03-13 14:45:02,Chrome,client-a.example.com,Client A intranet
+2026-03-13 14:49:58,Chrome,calendar.google.com,Calendar - Week
+2026-03-13 16:11:05,Chrome,app.slack.com,Slack
+2026-03-16 09:12:02,Chrome,calendar.google.com,Calendar - Week
+2026-03-16 09:13:18,Chrome,calendar.google.com,Calendar - Week
+2026-03-16 09:17:44,Chrome,calendar.google.com,Calendar - Week
+2026-03-16 09:31:09,Chrome,mail.google.com,Inbox
+2026-03-16 09:34:26,Chrome,client-a.example.com,Client A intranet
+2026-03-16 14:03:11,Chrome,docs.google.com,Untitled document - Google Docs
+2026-03-16 14:14:14,Chrome,app.slack.com,Slack
+2026-03-16 14:25:58,Chrome,client-a.example.com,Client A intranet
+2026-03-16 14:26:57,Chrome,claude.ai,Claude
+2026-03-16 14:29:43,Chrome,mail.google.com,Inbox
+2026-03-16 14:40:16,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-16 14:52:04,Chrome,app.slack.com,Slack
+2026-03-16 14:56:43,Chrome,client-a.example.com,Client A intranet
+2026-03-16 14:58:37,Chrome,calendar.google.com,Calendar - Week
+2026-03-16 15:03:12,Chrome,app.slack.com,Slack
+2026-03-16 15:03:53,Chrome,portal.client-a.example.com,Client A project portal
+2026-03-16 15:09:06,Chrome,mail.google.com,Inbox
+2026-03-16 15:12:44,Chrome,calendar.google.com,Calendar - Week
+2026-03-16 15:16:16,Chrome,app.slack.com,Slack
+2026-03-16 15:21:22,Chrome,client-a.example.com,Client A intranet

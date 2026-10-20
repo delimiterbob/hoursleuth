@@ -1,0 +1,25 @@
+{
+  "gapMinutes": 30,
+  "minBlockMinutes": 5,
+  "meetingWeight": 10,
+  "weeklyAllocationHours": 20,
+  "billableLabel": "Client A",
+
+  "adminPattern": "Person 5|Person 6|onboarding|payroll|benefits|tax form|handbook|background check|Laptop setup|IT setup|training|timesheet|time-tracking|\\[Admin",
+  "personalPattern": "\\[Personal",
+  "neutralPattern": "^Browser: (docs|drive|calendar|mail|accounts|meet|www)\\.google\\.com$|^Browser: (google|gmail)\\.com$|^Browser: (app\\.)?slack\\.com$|^Browser: (outlook\\.office|teams\\.microsoft)\\.com$|^Browser: claude\\.ai$",
+
+  "clientContacts": {
+    "Client Contact 1": "Client Contact 1 (Client A sponsor)",
+    "Client Contact 2": "Client Contact 2 (Client A IT)"
+  },
+
+  "timesheetThemes": [
+    { "label": "deck / slide development", "pattern": "deck|slides|presentation" },
+    { "label": "engagement documentation", "pattern": "RAID|stakeholder|questionnaire|tracker|discovery|RACI" },
+    { "label": "client access & provisioning", "pattern": "Client Contact 2|access|provision|VPN" },
+    { "label": "client coordination & scheduling", "pattern": "Client Contact 1|schedule|sessions|agenda" },
+    { "label": "scope / SOW review", "pattern": "SOW|scope|statement of work" },
+    { "label": "team coordination", "pattern": "#client-a|Person 1|Person 2|Person 3" }
+  ]
+}

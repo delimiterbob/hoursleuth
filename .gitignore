@@ -1,0 +1,21 @@
+# Never commit real activity data. Run hoursleuth in a folder outside this repo.
+# These patterns catch outputs created in the repo by mistake; the fictional
+# example in examples/synthetic is the only exception.
+/activity_*.csv
+/activity_report*.html
+/report_*.html
+/report_data.json
+/config.json
+/runs/
+History*.db
+*.sqlite
+browser_visits.csv
+!examples/synthetic/browser_visits.csv
+messages.csv
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
