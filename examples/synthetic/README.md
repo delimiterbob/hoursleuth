@@ -4,7 +4,7 @@ Two weeks (plus one day) of **entirely fictional** activity for a consultant wor
 
 | File | What it is |
 |---|---|
-| `config.json` | Settings: 30-minute gap, 20-hour weekly allocation, admin/personal patterns, client contacts, timesheet themes. |
+| `config.json` | Settings: 30-minute gap, 40-hour weekly allocation (the default), admin/personal patterns, client contacts, timesheet themes. |
 | `activity_events.csv` | Input: chat, email, meeting and file signals, including an inferred meeting, some onboarding admin and one personal exchange. |
 | `browser_visits.csv` | Input: browser visits, including a 4 a.m. session restore that the report flags with **check**. |
 | `activity_blocks.csv` | Output: one row per block, with minutes per category. |

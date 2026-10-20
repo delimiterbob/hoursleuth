@@ -127,7 +127,7 @@ const rx = p => { try { return p ? new RegExp(p, 'i') : null; } catch (e) { retu
 const ADMIN = rx(CFG.adminPattern), PERSONAL = rx(CFG.personalPattern), NEUTRAL = rx(CFG.neutralPattern);
 const CONTACTS = CFG.clientContacts || {};
 const THEMES = (CFG.timesheetThemes || []).map(t => ({ label: t.label, re: rx(t.pattern) })).filter(t => t.re);
-const ALLOC = Number(CFG.weeklyAllocationHours) || 0;
+const ALLOC = CFG.weeklyAllocationHours == null ? 40 : (Number(CFG.weeklyAllocationHours) || 0);   // default 40; 0 hides the line
 
 // ---------- helpers ----------
 const blocks = (DATA.blocks || []).map((b, i) => ({ ...b, i }));

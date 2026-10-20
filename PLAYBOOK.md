@@ -105,7 +105,7 @@ Settle these before collecting anything:
 | Gap rule | 30 minutes: a pause longer than this ends a block. |
 | Output | Spreadsheet (CSV) plus visual report. |
 | Billable categories | e.g. "Client A engagement" is billable; firm onboarding/admin is not; personal topics are excluded. |
-| Weekly allocation | e.g. 20 hours/week, shown as a reference line. |
+| Weekly allocation | 40 hours/week by default; set your own (e.g. 20 for a part-time engagement). Shown as a reference line. |
 | Devices | Which computers were used, and when work moved between them. |
 
 Record the answers in `config.json` (gap, allocation, category patterns) and in the starter prompt.
@@ -378,7 +378,7 @@ All in [`skills/hoursleuth/`](skills/hoursleuth). Settings live in `config.json`
 | `gapMinutes` | Pause that ends a block (default 30). |
 | `minBlockMinutes` | Minimum block length (default 5). |
 | `meetingWeight` | Votes per meeting (default 10). |
-| `weeklyAllocationHours` | Dashed reference line on the weekly chart; 0 hides it. |
+| `weeklyAllocationHours` | Dashed reference line on the weekly chart (default 40); 0 hides it. |
 | `billableLabel` | Shown in legends, e.g. "Billable (Client A)". |
 | `adminPattern`, `personalPattern`, `neutralPattern` | Regular expressions matched case-insensitively against each signal's `Detail`. In JSON, escape backslashes (`\\[Admin`). |
 | `clientContacts` | Name → display label, used to mark client contacts in the collaborator chart. |

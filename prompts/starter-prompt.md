@@ -12,7 +12,7 @@ Sources: my sent chat messages, my sent email, calendar meetings I accepted, fil
 
 Follow the method in `PLAYBOOK.md`: normalize to `activity_events.csv`, merge into blocks with a **30-minute** gap rule, categorize as billable / admin / personal with a proportional split, and build the HTML report with a draft timesheet using the scripts in `skills/hoursleuth`. Put my settings in `config.json`:
 
-- Weekly allocation: **[N] hours**
+- Weekly allocation: **[N] hours** (default 40)
 - Admin includes: **[HR contacts, IT contacts, onboarding, payroll, training, time-tracking]**
 - Personal includes: **[topics to exclude]**
 - Client contacts who aren't on chat: **[names and roles]**

@@ -2,7 +2,7 @@
   "gapMinutes": 30,
   "minBlockMinutes": 5,
   "meetingWeight": 10,
-  "weeklyAllocationHours": 20,
+  "weeklyAllocationHours": 40,
   "billableLabel": "Client A",
 
   "adminPattern": "Person 5|Person 6|onboarding|payroll|benefits|tax form|handbook|background check|Laptop setup|IT setup|training|timesheet|time-tracking|\\[Admin",
